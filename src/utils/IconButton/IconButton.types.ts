@@ -3,4 +3,6 @@ export type IconButtonProps = {
   size: number;
   callback: any;
   color?: string;
+  disabled?: boolean;
+  disaledColor?: string;
 };
