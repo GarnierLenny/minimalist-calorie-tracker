@@ -14,34 +14,76 @@ const formatDate = (date: Date): string => {
 
 type editAmountButtonProps = {
   value: string;
+  disabled?: boolean;
 };
 
-type unitTableType = {
-  [key: string]: string;
-}
-
-const unitTable: unitTableType = {
-  'calories': 'cal',
-  'protein': 'g',
-  'water': 'L',
+type unit = {
+  value: number;
+  goal: number;
+  unitType: string;
 };
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
-  const [calories, setCalories] = useState<number>(0);
-  const [caloriesGoal, setCaloriesGoal] = useState<number>(2100);
+  const [calories, setCalories] = useState<unit>({
+    value: 0,
+    goal: 2100,
+    unitType: 'cal',
+  });
+  const [proteins, setProteins] = useState<unit>({
+    value: 0,
+    goal: 100,
+    unitType: 'g',
+  });
+  const [water, setWater] = useState<unit>({
+    value: 0,
+    goal: 3000,
+    unitType: 'ml',
+  });
   const [selected, setSelected] = useState<string>('calories');
   const [date, setDate] = useState<Date>(new Date());
   const [referenceDate, setReferenceDate] = useState<string>(formatDate(date));
   // const width = useSharedValue(10);
 
+  type getSelectedType = {
+    [key: string]: {
+      unit: unit,
+      setter: any,
+    };
+  };
+
+  const getSelected: getSelectedType = {
+    'calories': {
+      unit: calories,
+      setter: setCalories,
+    },
+    'proteins': {
+      unit: proteins,
+      setter: setProteins,
+    },
+    'water': {
+      unit: water,
+      setter: setWater,
+    },
+  };
+
   useEffect(() => {
     const getCalories = async () => {
       try {
-        const storedCalories = await AsyncStorage.getItem(`${selected}-${formatDate(date)}`);
+        const storedCalories = await AsyncStorage.getItem(`${selected}-${formatDate(date)}-value`);
         if (storedCalories !== null) {
-          setCalories(JSON.parse(storedCalories));
+          setCalories((prevCalories: unit) => {
+            return {
+              ...prevCalories,
+              value: JSON.parse(storedCalories),
+            }
+          });
         } else {
-          setCalories(0);
+          setCalories((prevCalories: unit) => {
+            return {
+              ...prevCalories,
+              value: 0,
+            }
+          });
         }
       } catch (err) {
         console.log(err);
@@ -50,18 +92,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
 
     getCalories();
   }, [date]);
-
-  const handleCalorieChange = async (increment: number) => {
-    setCalories((prevCalories) => {
-      const newCalories = prevCalories + increment;
-      try {
-        AsyncStorage.setItem(`${selected}-${formatDate(date)}`, JSON.stringify(newCalories));
-      } catch (err) {
-        console.log('Error in storing new calories value', err);
-      }
-      return newCalories;
-    });
-  };
 
   const changeDateHandler = (increment: number) => {
     setDate(oldDate => {
@@ -73,13 +103,15 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }
 
   // AsyncStorage.clear();
-  const EditAmountButton = ({value}: editAmountButtonProps) => {
+  const EditAmountButton = ({value, disabled = false}: editAmountButtonProps) => {
     let inc = Number(value.split(' ')[1]);
 
     if (value[0] === '-')
       inc *= -1;
     return (
-      <TouchableOpacity style={{
+      <TouchableOpacity
+      disabled={disabled}
+      style={{
         borderWidth: 1,
         borderColor: '#000',
         borderRadius: 10,
@@ -87,10 +119,26 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         paddingHorizontal: 10,
         display: 'flex',
         alignItems: 'center',
-      }} onPress={() => handleCalorieChange(inc)}>
+      }} onPress={() => changedSelectedAmount(inc, setCalories)}>
         <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
       </TouchableOpacity>
     )
+  };
+
+  const changedSelectedAmount = (increment: number, setter: any) => {
+    setter((prevValue: unit) => {
+      const newAmount: number = (prevValue.value + increment) < 0 ? 0 : (prevValue.value + increment);
+
+      try {
+        AsyncStorage.setItem(`${selected}-${formatDate(date)}-value`, JSON.stringify(newAmount));
+      } catch (err) {
+        console.log('Error in storing new calories value', err);
+      }
+      return ({
+        ...prevValue,
+        value: newAmount,
+      });
+    });
   };
 
   // const handlePress = () => {
@@ -108,16 +156,16 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       </SafeAreaView>
       {/* 0g / 2100g section*/}
       <SafeAreaView style={{flexDirection: 'row', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
-        <Text style={{fontWeight: '600', fontSize: 43 }}>{calories}</Text>
-        <Text style={{fontWeight: '400', fontSize: 20, marginBottom: 8 }}>/{caloriesGoal}{unitTable[selected]}</Text>
+        <Text style={{fontWeight: '600', fontSize: 43 }}>{getSelected[selected].unit.value}</Text>
+        <Text style={{fontWeight: '400', fontSize: 20, marginBottom: 8 }}>/{getSelected[selected].unit.goal}{getSelected[selected].unit.unitType}</Text>
       </SafeAreaView>
       {/* Change cal val section*/}
       <SafeAreaView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
         <SafeAreaView style={{flexDirection: 'row', gap: 20}}>
-          <EditAmountButton value="- 100" />
-          <EditAmountButton value="- 10" />
+          <EditAmountButton disabled={getSelected[selected].unit.value === 0} value="- 100" />
+          <EditAmountButton disabled={getSelected[selected].unit.value === 0} value="- 10" />
         </SafeAreaView>
-        <TouchableOpacity onPress={() => handleCalorieChange(calories * -1)}>
+        <TouchableOpacity onPress={() => changedSelectedAmount(getSelected[selected].unit.value * -1, getSelected[selected].setter)}>
           <Text style={{fontSize: 10, fontWeight: '600'}}>RESET</Text>
         </TouchableOpacity>
         <SafeAreaView style={{flexDirection: 'row', gap: 20}}>
@@ -127,11 +175,15 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       </SafeAreaView>
       {/* Change selected intake option section*/}
       <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setSelected('calories')}>
           <Text>Calories</Text>
         </TouchableOpacity>
-        <Text>Proteins</Text>
-        <Text>Water</Text>
+        <TouchableOpacity onPress={() => setSelected('proteins')}>
+          <Text>Proteins</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSelected('water')}>
+          <Text>Water</Text>
+        </TouchableOpacity>
         <Text style={{right: 0}}>+</Text>
       </SafeAreaView>
       {/* <View style={{ flex: 1, alignItems: 'center' }}>
