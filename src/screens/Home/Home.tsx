@@ -151,7 +151,10 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     });
   };
 
+  const [animate, setAnimate] = useState<boolean>(false);
+
   const changeSelected = async (newSelected: string) => {
+    setAnimate(true);
     setSelected(newSelected);
     AsyncStorage.setItem('last-selected', newSelected);
   };
@@ -163,19 +166,14 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   const ChangeSelectButton = ({targetSelection}: ChangeSelectButtonProps) => {
     const capitalized = targetSelection.charAt(0).toUpperCase() + targetSelection.slice(1, targetSelection.length);
 
-    return selected === targetSelection ?
-      <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={FlipInEasyX} exiting={FlipOutEasyX}>
-        <Text style={{fontWeight: '600', color: '#fff'}}>{capitalized}</Text>
-      </Animated.View>
-      :
-      <TouchableOpacity style={{paddingVertical: 5, paddingHorizontal: 10}} onPress={() => changeSelected(targetSelection)}>
+    return (<TouchableOpacity style={{paddingVertical: 5, paddingHorizontal: 10}} onPress={() => changeSelected(targetSelection)}>
         <Text>{capitalized}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>)
   }
 
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
-      {/* Change date section*/}
+      {/* date section*/}
       <SafeAreaView style={styles.dateContainer}>
         <IconButton name="arrow-left-bold-circle" size={25} callback={() => changeDateHandler(-1)} />
         <Text style={styles.dateText}>{date.getDate()}/{date.getMonth() + 1}/
@@ -201,11 +199,26 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
           <EditAmountButton paddingInc={5} value="+ 100" />
         </SafeAreaView>
       </SafeAreaView>
-      {/* Change selected intake option section*/}
+      {/* Change selected intake section*/}
       <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
-        <ChangeSelectButton targetSelection="calories" />
-        <ChangeSelectButton targetSelection="proteins" />
-        <ChangeSelectButton targetSelection="water" />
+        {selected === 'calories' ?
+          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={animate ? FlipInEasyX : undefined} exiting={animate ? FlipOutEasyX : undefined}>
+            <Text style={{fontWeight: '600', color: '#fff'}}>Calories</Text>
+          </Animated.View>
+          :
+          <ChangeSelectButton targetSelection="calories" />}
+        {selected === 'proteins' ?
+          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={animate ? FlipInEasyX : undefined} exiting={animate ? FlipOutEasyX : undefined}>
+            <Text style={{fontWeight: '600', color: '#fff'}}>Proteins</Text>
+          </Animated.View>
+          :
+          <ChangeSelectButton targetSelection="proteins" />}
+        {selected === 'water' ?
+          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={animate ? FlipInEasyX : undefined} exiting={animate ? FlipOutEasyX : undefined}>
+            <Text style={{fontWeight: '600', color: '#fff'}}>Water</Text>
+          </Animated.View>
+          :
+          <ChangeSelectButton targetSelection="water" />}
         <Text style={{padding: 5, marginLeft: 10, fontWeight: '500'}}>+</Text>
       </SafeAreaView>
     </SafeAreaView>
