@@ -7,21 +7,8 @@ import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
-
-const formatDate = (date: Date): string => {
-  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-}
-
-type editAmountButtonProps = {
-  value: string;
-  disabled?: boolean;
-};
-
-type unit = {
-  value: number;
-  goal: number;
-  unitType: string;
-};
+import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
+import { formatDate } from "../../utils/formatDate";
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
   const [calories, setCalories] = useState<unit>({
@@ -43,13 +30,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   const [date, setDate] = useState<Date>(new Date());
   const [referenceDate, setReferenceDate] = useState<string>(formatDate(date));
   // const width = useSharedValue(10);
-
-  type getSelectedType = {
-    [key: string]: {
-      unit: unit,
-      setter: any,
-    };
-  };
 
   const getSelected: getSelectedType = {
     'calories': {
@@ -90,6 +70,18 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       }
     };
 
+    const getLastSelected = async () => {
+      try {
+        const lastSelected = await AsyncStorage.getItem('last-selected');
+        if (lastSelected !== null) {
+          setSelected(lastSelected);
+        }
+      } catch {
+        console.error('Error in retrieving last selected');
+      }
+    };
+
+    getLastSelected();
     getCalories('calories', setCalories);
     getCalories('proteins', setProteins);
     getCalories('water', setWater);
@@ -104,7 +96,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     })
   }
 
-  // AsyncStorage.clear();
   const EditAmountButton = ({value, disabled = false}: editAmountButtonProps) => {
     let inc = Number(value.split(' ')[1]);
 
@@ -143,6 +134,11 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     });
   };
 
+  const changeSelected = async (newSelected: string) => {
+    setSelected(newSelected);
+    AsyncStorage.setItem('last-selected', newSelected);
+  };
+
   // const handlePress = () => {
   //   width.value = withSpring(width.value + 50);
   // };
@@ -177,13 +173,13 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       </SafeAreaView>
       {/* Change selected intake option section*/}
       <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
-        <TouchableOpacity onPress={() => setSelected('calories')}>
+        <TouchableOpacity onPress={() => changeSelected('calories')}>
           <Text>Calories</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelected('proteins')}>
+        <TouchableOpacity onPress={() => changeSelected('proteins')}>
           <Text>Proteins</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelected('water')}>
+        <TouchableOpacity onPress={() => changeSelected('water')}>
           <Text>Water</Text>
         </TouchableOpacity>
         <Text style={{right: 0}}>+</Text>
