@@ -6,7 +6,7 @@ import styles from "./Home.styles";
 import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 
@@ -96,25 +96,43 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     })
   }
 
-  const EditAmountButton = ({value, disabled = false}: editAmountButtonProps) => {
+  const EditAmountButton = ({value, paddingInc = 0, disabled = false}: editAmountButtonProps) => {
     let inc = Number(value.split(' ')[1]);
+    const [pressed, setPressed] = useState<boolean>(false);
 
-    if (value[0] === '-')
-      inc *= -1;
+    if (value[0] === '-') inc *= -1;
     return (
-      <TouchableOpacity
-      disabled={disabled}
-      style={{
-        borderWidth: 1,
-        borderColor: '#000',
-        borderRadius: 10,
-        paddingVertical: 15 ,
-        paddingHorizontal: 10,
-        display: 'flex',
-        alignItems: 'center',
-      }} onPress={() => changedSelectedAmount(inc, getSelected[selected].setter)}>
-        <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
-      </TouchableOpacity>
+      <SafeAreaView style={{display: 'flex', justifyContent: 'center'}}>
+        <TouchableOpacity
+        disabled={disabled}
+        style={{
+          borderWidth: 1,
+          borderColor: pressed ? '#fff' : '#000',
+          backgroundColor: '#fff',
+          borderRadius: 10,
+          paddingVertical: 15 + paddingInc ,
+          paddingHorizontal: 10 + paddingInc,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
+        onPress={() => changedSelectedAmount(inc, getSelected[selected].setter)}>
+          <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
+        </TouchableOpacity>
+        <SafeAreaView
+        style={{
+          position: 'absolute',
+          backgroundColor: '#000',
+          borderRadius: 10,
+          paddingVertical: 16 + paddingInc,
+          paddingHorizontal: 11 + paddingInc,
+          zIndex: -1,
+          top: paddingInc !== 0 ? 5 : 10,
+        }}>
+          <Text style={{fontSize: 20, fontWeight: '500', color: pressed === true ? "#fff" : "#000"}}>{value}</Text>
+        </SafeAreaView>
+      </SafeAreaView>
     )
   };
 
@@ -159,16 +177,16 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       </SafeAreaView>
       {/* Change cal val section*/}
       <SafeAreaView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
-        <SafeAreaView style={{flexDirection: 'row', gap: 20}}>
-          <EditAmountButton disabled={getSelected[selected].unit.value === 0} value="- 100" />
+        <SafeAreaView style={{flexDirection: 'row', gap: 15}}>
+          <EditAmountButton paddingInc={5} disabled={getSelected[selected].unit.value === 0} value="- 100" />
           <EditAmountButton disabled={getSelected[selected].unit.value === 0} value="- 10" />
         </SafeAreaView>
         <TouchableOpacity onPress={() => changedSelectedAmount(getSelected[selected].unit.value * -1, getSelected[selected].setter)}>
-          <Text style={{fontSize: 10, fontWeight: '600'}}>RESET</Text>
+          <Text style={{fontSize: 12, fontWeight: '600', color: '#1E90FF'}}>RESET</Text>
         </TouchableOpacity>
-        <SafeAreaView style={{flexDirection: 'row', gap: 20}}>
+        <SafeAreaView style={{flexDirection: 'row', gap: 15}}>
           <EditAmountButton value="+ 10" />
-          <EditAmountButton value="+ 100" />
+          <EditAmountButton paddingInc={5} value="+ 100" />
         </SafeAreaView>
       </SafeAreaView>
       {/* Change selected intake option section*/}

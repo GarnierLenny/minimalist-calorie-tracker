@@ -7,6 +7,7 @@ export type getSelectedType = {
 
 export type editAmountButtonProps = {
   value: string;
+  paddingInc?: number;
   disabled?: boolean;
 };
 
