@@ -6,7 +6,7 @@ import styles from "./Home.styles";
 import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Animated, { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, FlipInEasyX, FlipOutEasyX } from 'react-native-reanimated';
 import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 
@@ -29,7 +29,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   const [selected, setSelected] = useState<string>('calories');
   const [date, setDate] = useState<Date>(new Date());
   const [referenceDate, setReferenceDate] = useState<string>(formatDate(date));
-  // const width = useSharedValue(10);
 
   const getSelected: getSelectedType = {
     'calories': {
@@ -97,44 +96,44 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }
 
   const EditAmountButton = ({value, paddingInc = 0, disabled = false}: editAmountButtonProps) => {
-    let inc = Number(value.split(' ')[1]);
+    let inc = Number(value.replace(' ', ''));
     const [pressed, setPressed] = useState<boolean>(false);
 
-    if (value[0] === '-') inc *= -1;
-    return (
-      <SafeAreaView style={{display: 'flex', justifyContent: 'center'}}>
-        <TouchableOpacity
-        disabled={disabled}
-        style={{
-          borderWidth: 1,
-          borderColor: pressed ? '#fff' : '#000',
-          backgroundColor: '#fff',
-          borderRadius: 10,
-          paddingVertical: 15 + paddingInc ,
-          paddingHorizontal: 10 + paddingInc,
-          display: 'flex',
-          alignItems: 'center',
-        }}
-        onPressIn={() => setPressed(true)}
-        onPressOut={() => setPressed(false)}
-        onPress={() => changedSelectedAmount(inc, getSelected[selected].setter)}>
-          <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
-        </TouchableOpacity>
-        <SafeAreaView
+  return (
+    <SafeAreaView style={{display: 'flex', justifyContent: 'center'}}>
+      <SafeAreaView
         style={{
           position: 'absolute',
           backgroundColor: '#000',
           borderRadius: 10,
           paddingVertical: 16 + paddingInc,
-          paddingHorizontal: 11 + paddingInc,
           zIndex: -1,
+          paddingHorizontal: 11 + paddingInc,
           top: paddingInc !== 0 ? 5 : 10,
         }}>
-          <Text style={{fontSize: 20, fontWeight: '500', color: pressed === true ? "#fff" : "#000"}}>{value}</Text>
-        </SafeAreaView>
+        <Text style={{fontSize: 20, fontWeight: '500', color: pressed === true ? "rgba(255, 255, 255, 0.4)" : "#000"}}>{value}</Text>
       </SafeAreaView>
-    )
-  };
+      <TouchableOpacity
+      disabled={disabled}
+      style={{
+        borderWidth: 1,
+        borderColor: pressed ? '#fff' : '#000',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingVertical: 15 + paddingInc ,
+        paddingHorizontal: 10 + paddingInc,
+        display: 'flex',
+        zIndex: 1,
+        alignItems: 'center',
+      }}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      onPress={() => changedSelectedAmount(inc, getSelected[selected].setter)}>
+        <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  )
+};
 
   const changedSelectedAmount = (increment: number, setter: any) => {
     setter((prevValue: unit) => {
@@ -157,9 +156,22 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     AsyncStorage.setItem('last-selected', newSelected);
   };
 
-  // const handlePress = () => {
-  //   width.value = withSpring(width.value + 50);
-  // };
+  type ChangeSelectButtonProps = {
+    targetSelection: string;
+  };
+
+  const ChangeSelectButton = ({targetSelection}: ChangeSelectButtonProps) => {
+    const capitalized = targetSelection.charAt(0).toUpperCase() + targetSelection.slice(1, targetSelection.length);
+
+    return selected === targetSelection ?
+      <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={FlipInEasyX} exiting={FlipOutEasyX}>
+        <Text style={{fontWeight: '600', color: '#fff'}}>{capitalized}</Text>
+      </Animated.View>
+      :
+      <TouchableOpacity style={{paddingVertical: 5, paddingHorizontal: 10}} onPress={() => changeSelected(targetSelection)}>
+        <Text>{capitalized}</Text>
+      </TouchableOpacity>
+  }
 
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
@@ -191,27 +203,11 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       </SafeAreaView>
       {/* Change selected intake option section*/}
       <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
-        <TouchableOpacity onPress={() => changeSelected('calories')}>
-          <Text>Calories</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeSelected('proteins')}>
-          <Text>Proteins</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeSelected('water')}>
-          <Text>Water</Text>
-        </TouchableOpacity>
-        <Text style={{right: 0}}>+</Text>
+        <ChangeSelectButton targetSelection="calories" />
+        <ChangeSelectButton targetSelection="proteins" />
+        <ChangeSelectButton targetSelection="water" />
+        <Text style={{padding: 5, marginLeft: 10, fontWeight: '500'}}>+</Text>
       </SafeAreaView>
-      {/* <View style={{ flex: 1, alignItems: 'center' }}>
-        <Animated.View
-          style={{
-            width,
-            height: 100,
-            backgroundColor: 'violet',
-          }}
-        />
-        <Button onPress={handlePress} title="Click me" />
-    </View> */}
     </SafeAreaView>
   );
 };
