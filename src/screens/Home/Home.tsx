@@ -67,20 +67,20 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   };
 
   useEffect(() => {
-    const getCalories = async () => {
+    const getCalories = async (name: string, setter: any) => {
       try {
-        const storedCalories = await AsyncStorage.getItem(`${selected}-${formatDate(date)}-value`);
-        if (storedCalories !== null) {
-          setCalories((prevCalories: unit) => {
+        const stored = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
+        if (stored !== null) {
+          setter((prevCalories: unit) => {
             return {
               ...prevCalories,
-              value: JSON.parse(storedCalories),
+              value: JSON.parse(stored),
             }
           });
         } else {
-          setCalories((prevCalories: unit) => {
+          setter((prev: unit) => {
             return {
-              ...prevCalories,
+              ...prev,
               value: 0,
             }
           });
@@ -90,7 +90,9 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       }
     };
 
-    getCalories();
+    getCalories('calories', setCalories);
+    getCalories('proteins', setProteins);
+    getCalories('water', setWater);
   }, [date]);
 
   const changeDateHandler = (increment: number) => {
@@ -119,7 +121,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         paddingHorizontal: 10,
         display: 'flex',
         alignItems: 'center',
-      }} onPress={() => changedSelectedAmount(inc, setCalories)}>
+      }} onPress={() => changedSelectedAmount(inc, getSelected[selected].setter)}>
         <Text style={{fontSize: 20, fontWeight: '500'}}>{value}</Text>
       </TouchableOpacity>
     )
