@@ -3,8 +3,15 @@ import { SafeAreaView, Text, TouchableOpacity } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { unit, editAmountButtonProps } from "../Home.types";
 import { formatDate } from "../../../utils/formatDate";
+import { getSelectedType } from "../Home.types";
 
-const ChangeValueButtons = ({selected, date, getSelected}) => {
+type ChangeValueButtonsProps = {
+  selected: string;
+  date: Date;
+  getSelected: getSelectedType;
+};
+
+const ChangeValueButtons = ({selected, date, getSelected}: ChangeValueButtonsProps) => {
   const EditAmountButton = ({value, paddingInc = 0, disabled = false}: editAmountButtonProps) => {
     let inc = Number(value.replace(' ', ''));
     const [pressed, setPressed] = useState<boolean>(false);

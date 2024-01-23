@@ -11,6 +11,7 @@ import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 import ChangeSection from "./components/ChangeSection.component";
 import ChangeValueButtons from "./components/ChangeValueButtons.component";
+import DateSection from "./components/ChangeDate.component";
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
   const [calories, setCalories] = useState<unit>({
@@ -30,7 +31,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   });
   const [selected, setSelected] = useState<string>('calories');
   const [date, setDate] = useState<Date>(new Date());
-  const [referenceDate, setReferenceDate] = useState<string>(formatDate(date));
 
   const getSelected: getSelectedType = {
     'calories': {
@@ -88,56 +88,10 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     getCalories('water', setWater);
   }, [date]);
 
-  const rotateX = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => (
-    {transform: [{ perspective: 500 }, { rotateX: `${rotateX.value}deg` }]}
-  ));
-
-
-  const changeDateHandler = (increment: number) => {
-    setDate(oldDate => {
-      const newDate = new Date(oldDate);
-
-      rotateX.value = withTiming(90, { duration: 100, easing: Easing.linear }, () => {
-        rotateX.value = withTiming(0, { duration: 100, easing: Easing.linear });
-      });
-      setTimeout(() => {
-        newDate.setDate(newDate.getDate() + increment);
-      }, 70);
-      return newDate;
-    })
-  }
-
-  const changeSelected = async (newSelected: string) => {
-    setSelected(newSelected);
-    AsyncStorage.setItem('last-selected', newSelected);
-  };
-
-  type ChangeSelectButtonProps = {
-    targetSelection: string;
-  };
-
-  const ChangeSelectButton = ({targetSelection}: ChangeSelectButtonProps) => {
-    const capitalized = targetSelection.charAt(0).toUpperCase() + targetSelection.slice(1, targetSelection.length);
-
-    return (<TouchableOpacity style={{paddingVertical: 5, paddingHorizontal: 10}} onPress={() => changeSelected(targetSelection)}>
-        <Text>{capitalized}</Text>
-      </TouchableOpacity>)
-  }
-
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
       {/* date section*/}
-      <SafeAreaView style={styles.dateContainer}>
-        <IconButton name="arrow-left-bold-circle" size={25} callback={() => changeDateHandler(-1)} />
-        <SafeAreaView style={{backgroundColor: '#fff', borderRadius: 10}}>
-          <Animated.View style={[{paddingHorizontal: 10, paddingVertical: 10}, animatedStyle]}>
-            <Text style={styles.dateText}>{date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}</Text>
-          </Animated.View>
-        </SafeAreaView>
-        <IconButton color='#000' disabled={formatDate(date) === referenceDate ? true : false} name="arrow-right-bold-circle" size={25} callback={() => changeDateHandler(+1)} />
-      </SafeAreaView>
+      <DateSection date={date} setDate={setDate} />
       {/* 0g / 2100g section*/}
       <SafeAreaView style={{flexDirection: 'row', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
         <Text style={{fontWeight: '600', fontSize: 43 }}>{getSelected[selected].unit.value}</Text>
@@ -146,7 +100,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       {/* Change cal val section*/}
       <ChangeValueButtons selected={selected} getSelected={getSelected} date={date} />
       {/* Change selected intake section*/}
-      <ChangeSection selected={selected} ChangeSelectButton={ChangeSelectButton} />
+      <ChangeSection selected={selected} setSelected={setSelected} />
     </SafeAreaView>
   );
 };

@@ -1,8 +1,33 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {  } from "react";
-import { SafeAreaView, Text } from "react-native";
+import { SafeAreaView, Text, TouchableOpacity } from "react-native";
 import Animated, { FlipInEasyX, FlipOutEasyX } from 'react-native-reanimated';
 
-const ChangeSection = ({selected, ChangeSelectButton}) => {
+type ChangeSelectButtonProps = {
+  targetSelection: string;
+};
+
+type ChangeSectionProps = {
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const ChangeSection = ({selected, setSelected}: ChangeSectionProps) => {
+  const changeSelected = async (newSelected: string) => {
+    setSelected(newSelected);
+    AsyncStorage.setItem('last-selected', newSelected);
+  };
+
+  const ChangeSelectButton = ({targetSelection}: ChangeSelectButtonProps) => {
+    const capitalized = targetSelection.charAt(0).toUpperCase() + targetSelection.slice(1, targetSelection.length);
+
+    return (
+    <TouchableOpacity style={{paddingVertical: 5, paddingHorizontal: 10}} onPress={() => changeSelected(targetSelection)}>
+      <Text>{capitalized}</Text>
+    </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
       {selected === 'calories' ?
