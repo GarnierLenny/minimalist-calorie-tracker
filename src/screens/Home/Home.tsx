@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { useSharedValue, FlipInEasyX, FlipOutEasyX, withTiming, Easing, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
+import ChangeSection from "./components/ChangeSection.component";
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
   const [calories, setCalories] = useState<unit>({
@@ -212,27 +213,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         </SafeAreaView>
       </SafeAreaView>
       {/* Change selected intake section*/}
-      <SafeAreaView style={{flexDirection: 'row', marginTop: 50, justifyContent: 'space-evenly', width: '70%', alignSelf: 'center'}}>
-        {selected === 'calories' ?
-          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={FlipInEasyX} exiting={FlipOutEasyX}>
-            <Text style={{fontWeight: '600', color: '#fff'}}>Calories</Text>
-          </Animated.View>
-          :
-          <ChangeSelectButton targetSelection="calories" />}
-        {selected === 'proteins' ?
-          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={FlipInEasyX} exiting={FlipOutEasyX}>
-            <Text style={{fontWeight: '600', color: '#fff'}}>Proteins</Text>
-          </Animated.View>
-          :
-          <ChangeSelectButton targetSelection="proteins" />}
-        {selected === 'water' ?
-          <Animated.View style={{backgroundColor: '#000', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15}} entering={FlipInEasyX} exiting={FlipOutEasyX}>
-            <Text style={{fontWeight: '600', color: '#fff'}}>Water</Text>
-          </Animated.View>
-          :
-          <ChangeSelectButton targetSelection="water" />}
-        <Text style={{padding: 5, marginLeft: 10, fontWeight: '500'}}>+</Text>
-      </SafeAreaView>
+      <ChangeSection selected={selected} ChangeSelectButton={ChangeSelectButton} />
     </SafeAreaView>
   );
 };
