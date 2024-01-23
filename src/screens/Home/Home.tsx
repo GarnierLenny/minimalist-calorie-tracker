@@ -7,11 +7,12 @@ import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { useSharedValue, FlipInEasyX, FlipOutEasyX, withTiming, Easing, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { unit, getSelectedType, editAmountButtonProps } from "./Home.types";
+import { unit, getSelectedType } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 import ChangeSection from "./components/ChangeSection.component";
 import ChangeValueButtons from "./components/ChangeValueButtons.component";
 import DateSection from "./components/ChangeDate.component";
+import CustomButtonIcon from "../../utils/CustomButton/CustomButtonIcon.utils";
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
   const [calories, setCalories] = useState<unit>({
@@ -31,7 +32,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   });
   const [selected, setSelected] = useState<string>('calories');
   const [date, setDate] = useState<Date>(new Date());
-
   const getSelected: getSelectedType = {
     'calories': {
       unit: calories,
@@ -93,9 +93,10 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       {/* date section*/}
       <DateSection date={date} setDate={setDate} />
       {/* 0g / 2100g section*/}
-      <SafeAreaView style={{flexDirection: 'row', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
+      <SafeAreaView style={{flexDirection: 'row', left: '2.5%', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
         <Text style={{fontWeight: '600', fontSize: 43 }}>{getSelected[selected].unit.value}</Text>
         <Text style={{fontWeight: '400', fontSize: 20, marginBottom: 8 }}>/{getSelected[selected].unit.goal}{getSelected[selected].unit.unitType}</Text>
+        <CustomButtonIcon pressCallback={() => console.log('click!')} iconName="pencil" iconSize={20}  />
       </SafeAreaView>
       {/* Change cal val section*/}
       <ChangeValueButtons selected={selected} getSelected={getSelected} date={date} />
