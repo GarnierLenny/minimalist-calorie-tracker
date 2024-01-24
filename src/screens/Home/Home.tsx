@@ -46,6 +46,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       setter: setWater,
     },
   };
+  const [editGoal, setEditGoal] = useState<boolean>(false);
 
   useEffect(() => {
     const getCalories = async (name: string, setter: any) => {
@@ -88,15 +89,62 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     getCalories('water', setWater);
   }, [date]);
 
+  const valueFontSize = useSharedValue(43);
+  const valueFontWeight = useSharedValue(600);
+  const valueMarginBottom = useSharedValue(0);
+
+  const goalFontSize = useSharedValue(20);
+  const goalFontWeight = useSharedValue(600);
+  const goalMarginBotton = useSharedValue(8);
+
+  const focusValue = () => {
+    valueFontWeight.value = 600;
+    goalFontWeight.value = 400;
+    valueMarginBottom.value = withTiming(0);
+    goalMarginBotton.value = withTiming(8);
+
+    valueFontSize.value = withSpring(43);
+    goalFontSize.value = withSpring(20);
+  };
+
+  const focusGoal = () => {
+    valueFontWeight.value = 400;
+    goalFontWeight.value = 600;
+    valueMarginBottom.value = withTiming(10);
+    goalMarginBotton.value = withTiming(-5);
+
+    valueFontSize.value = withSpring(20);
+    goalFontSize.value = withSpring(43);
+  };
+
+  const textValueStyle = useAnimatedStyle(() => {
+    return {
+      fontWeight: valueFontWeight.value.toString(),
+      fontSize: valueFontSize.value,
+      marginBottom: valueMarginBottom.value,
+    };
+  });
+
+  const textGoalStyle = useAnimatedStyle(() => {
+    return {
+      fontWeight: goalFontWeight.value.toString(),
+      fontSize: goalFontSize.value,
+      marginBottom: goalMarginBotton.value,
+    };
+  });
+
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
       {/* date section*/}
       <DateSection date={date} setDate={setDate} />
       {/* 0g / 2100g section*/}
       <SafeAreaView style={{flexDirection: 'row', left: '2.5%', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
-        <Text style={{fontWeight: '600', fontSize: 43 }}>{getSelected[selected].unit.value}</Text>
-        <Text style={{fontWeight: '400', fontSize: 20, marginBottom: 8 }}>/{getSelected[selected].unit.goal}{getSelected[selected].unit.unitType}</Text>
-        <CustomButtonIcon pressCallback={() => console.log('click!')} iconName="pencil" iconSize={20}  />
+        <Animated.Text style={textValueStyle}>{getSelected[selected].unit.value}</Animated.Text>
+        <Animated.Text style={textGoalStyle}>/{getSelected[selected].unit.goal}{getSelected[selected].unit.unitType}</Animated.Text>
+        <CustomButtonIcon pressCallback={() => {
+          setEditGoal(!editGoal);
+          return editGoal ? focusGoal() : focusValue();
+        }} iconName={editGoal ? 'pencil' : 'target'} iconSize={20}  />
       </SafeAreaView>
       {/* Change cal val section*/}
       <ChangeValueButtons selected={selected} getSelected={getSelected} date={date} />
