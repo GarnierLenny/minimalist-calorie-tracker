@@ -5,38 +5,37 @@ import { unit, ChangeValueButtonsProps } from "../Home.types";
 import { formatDate } from "../../../utils/formatDate";
 import CustomButtonText from "../../../utils/CustomButton/CustomButtonText.utils";
 
-const changedSelectedAmount = (
+const changeSelectedAmount = (
   increment: number,
-  selected: string,
+  selected: unit,
   date: Date,
   setter: any) => {
-  setter((prevValue: unit) => {
-    const newAmount: number = (prevValue.value + increment) < 0 ? 0 : (prevValue.value + increment);
+  setter((prevArr: unit[]) => {
+    const newAmount = selected.value + increment;
+    let tempArray: unit[] = [...prevArr];
 
+    tempArray[tempArray.findIndex((item) => item.unitName === selected.unitName)].value = newAmount;
     try {
-      AsyncStorage.setItem(`${selected}-${formatDate(date)}-value`, JSON.stringify(newAmount));
+      AsyncStorage.setItem(`${selected.unitName}-${formatDate(date)}-value`, JSON.stringify(newAmount));
     } catch (err) {
-      console.log('Error in storing new calories value', err);
+      console.log('Error in storing new value', err);
     }
-    return ({
-      ...prevValue,
-      value: newAmount,
-    });
+    return tempArray;
   });
 };
 
-const ChangeValueButtons = ({selected, date, getSelected}: ChangeValueButtonsProps) => {
+const ChangeValueButtons = ({date, setIntakeTrack, selected}: ChangeValueButtonsProps) => {
   const editCallback = (value: number) => {
-    changedSelectedAmount(value, selected, date, getSelected[selected].setter)
+    changeSelectedAmount(value, selected, date, setIntakeTrack);
   };
 
   return (
     <SafeAreaView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
       <SafeAreaView style={{flexDirection: 'row', gap: 15}}>
-        <CustomButtonText textContent="-100" pressCallback={() => editCallback(-100)} paddingInc={5} disabled={getSelected[selected].unit.value === 0} />
-        <CustomButtonText textContent="-10" pressCallback={() => editCallback(-10)} disabled={getSelected[selected].unit.value === 0} />
+        <CustomButtonText textContent="-100" pressCallback={() => editCallback(-100)} paddingInc={5} disabled={selected.value === 0} />
+        <CustomButtonText textContent="-10" pressCallback={() => editCallback(-10)} disabled={selected.value === 0} />
       </SafeAreaView>
-      <TouchableOpacity onPress={() => changedSelectedAmount(getSelected[selected].unit.value * -1, selected, date, getSelected[selected].setter)}>
+      <TouchableOpacity onPress={() => changeSelectedAmount(selected.value * -1, selected, date, setIntakeTrack)}>
         <Text style={{fontSize: 12, fontWeight: '600', color: '#1E90FF'}}>RESET</Text>
       </TouchableOpacity>
       <SafeAreaView style={{flexDirection: 'row', gap: 15}}>

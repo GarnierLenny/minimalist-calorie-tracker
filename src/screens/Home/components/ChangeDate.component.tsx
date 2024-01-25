@@ -22,12 +22,10 @@ const DateSection = ({date, setDate}: DateSectionProps) => {
     setDate((oldDate: Date) => {
       const newDate = new Date(oldDate);
 
-      rotateX.value = withTiming(90, { duration: 100, easing: Easing.linear }, () => {
-        rotateX.value = withTiming(0, { duration: 100, easing: Easing.linear });
-      });
-      setTimeout(() => {
-        newDate.setDate(newDate.getDate() + increment);
-      }, 70);
+      // rotateX.value = withTiming(90, { duration: 100, easing: Easing.linear }, () => {
+      //   rotateX.value = withTiming(0, { duration: 100, easing: Easing.linear });
+      // });
+      newDate.setDate(newDate.getDate() + increment);
       return newDate;
     })
   }
