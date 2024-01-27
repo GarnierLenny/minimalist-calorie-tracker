@@ -36,54 +36,14 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   ]);
   const [selected, setSelected] = useState<number>(0);
   const [date, setDate] = useState<Date>(new Date());
-  const [editGoal, setEditGoal] = useState<boolean>(false);
-
-  useEffect(() => {
-    // setEditGoal(false);
-    const getIntake = async (name: string) => {
-      try {
-        const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
-        const stored = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
-        const storedValue: number = stored === null ? 0 : Number(stored);
-
-        if (stored === null) {
-          console.log('toto');
-          await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, '0');
-        } else {
-          let tempArray: unit[] = [...intakeTrack];
-
-          tempArray[itemIndex].value = storedValue;
-          setIntakeTrack(tempArray);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    const getLastSelected = async () => {
-      try {
-        const lastSelected = await AsyncStorage.getItem('last-selected');
-        if (lastSelected !== null) {
-          setSelected(Number(lastSelected));
-        }
-      } catch {
-        console.error('Error in retrieving last selected');
-      }
-    };
-
-    getLastSelected();
-    intakeTrack.map((intake: unit) => {
-      getIntake(intake.unitName);
-    });
-    // console.log(intakeTrack);
-  }, [date]);
+  const [editGoal, setEditGoal] = useState<boolean>(true);
 
   const valueFontSize = useSharedValue(43);
   const valueFontWeight = useSharedValue(600);
   const valueMarginBottom = useSharedValue(0);
 
   const goalFontSize = useSharedValue(20);
-  const goalFontWeight = useSharedValue(600);
+  const goalFontWeight = useSharedValue(400);
   const goalMarginBotton = useSharedValue(8);
 
   const focusValue = () => {
@@ -122,7 +82,43 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     };
   });
 
-  // console.log('from main', intakeTrack);
+  useEffect(() => {
+    const getIntake = async (name: string) => {
+      try {
+        const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
+        const stored = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
+        const storedValue: number = stored === null ? 0 : Number(stored);
+
+        if (stored === null) {
+          console.log('toto');
+          await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, '0');
+        } else {
+          let tempArray: unit[] = [...intakeTrack];
+
+          tempArray[itemIndex].value = storedValue;
+          setIntakeTrack(tempArray);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const getLastSelected = async () => {
+      try {
+        const lastSelected = await AsyncStorage.getItem('last-selected');
+        if (lastSelected !== null) {
+          setSelected(Number(lastSelected));
+        }
+      } catch {
+        console.error('Error in retrieving last selected');
+      }
+    };
+
+    getLastSelected();
+    intakeTrack.map((intake: unit) => {
+      getIntake(intake.unitName);
+    });
+  }, [date]);
 
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
@@ -135,7 +131,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         <CustomButtonIcon pressCallback={() => {
           setEditGoal(!editGoal);
           return editGoal ? focusGoal() : focusValue();
-        }} iconName={editGoal ? 'pencil' : 'target'} iconSize={20}  />
+        }} iconName={!editGoal ? 'pencil' : 'target'} iconSize={20}  />
       </SafeAreaView>
       {/* Change cal val section*/}
       <ChangeValueButtons selected={intakeTrack[selected]} setIntakeTrack={setIntakeTrack} date={date} />
