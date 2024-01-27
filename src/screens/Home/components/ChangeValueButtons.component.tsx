@@ -30,7 +30,8 @@ const changeSelectedAmount = (
 const ChangeValueButtons = ({date, setIntakeTrack, selected, editGoal}: ChangeValueButtonsProps) => {
   const valueGoal = !editGoal ? 'goal' : 'value';
   const editCallback = (value: number) => {
-    changeSelectedAmount(value, selected, date, setIntakeTrack, valueGoal);
+    const newValue = !editGoal ? selected.goal + value : selected.value + value;
+    changeSelectedAmount(newValue, selected, date, setIntakeTrack, valueGoal);
   };
 
   return (
