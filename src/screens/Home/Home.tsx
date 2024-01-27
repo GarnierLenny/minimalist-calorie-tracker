@@ -83,12 +83,17 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   });
 
   useEffect(() => {
+    const setDefaultGoals = async (name: string, value: string) => {
+      await AsyncStorage.setItem(`${name}-defaultgoal`, value);
+    };
+
     const getIntake = async (name: string) => {
       try {
         const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
         const stored: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
         const storedValue: number = stored === null ? 0 : Number(stored);
 
+        await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
         const storedGoal: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
         let tempArray: unit[] = [...intakeTrack];
 
@@ -121,6 +126,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
 
     getLastSelected();
     intakeTrack.map((intake: unit) => {
+      setDefaultGoals(intake.unitName, intake.goal.toString());
       getIntake(intake.unitName);
     });
   }, [date]);
