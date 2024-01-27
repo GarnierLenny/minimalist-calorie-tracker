@@ -18,9 +18,9 @@ const DateSection = ({date, setDate}: DateSectionProps) => {
   const [referenceDate] = useState<string>(formatDate(date));
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const animatedStyle = useAnimatedStyle(() => (
-    {transform: [{ perspective: 500 }, { rotateX: `${rotateX.value}deg` }]}
-  ));
+  // const animatedStyle = useAnimatedStyle(() => (
+  //   {transform: [{ perspective: 500 }, { rotateX: `${rotateX.value}deg` }]}
+  // ));
 
   const changeDateHandler = (increment: number) => {
     setDate((oldDate: Date) => {
@@ -43,16 +43,20 @@ const DateSection = ({date, setDate}: DateSectionProps) => {
         animationIn='slideInDown'
         animationOut='slideOutUp'
         style={{borderRadius: 20}}
-        onDismiss={() => console.log('toto')}
       >
         <Calendar
         enableSwipeMonths={true}
         style={{paddingTop: 20, paddingBottom: 20, borderTopLeftRadius: 5, borderTopRightRadius: 5}}
-        onDayPress={(day) => console.log(day)}
+        maxDate={new Date().toString()}
+        onDayPress={(day) => {
+          const newDate = new Date(day.dateString);
+          setDate(newDate);
+          setModalVisible(false);
+        }}
         />
         <SafeAreaView>
           <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(false)} style={{borderBottomRightRadius: 5, borderBottomLeftRadius: 5, alignItems: 'flex-end', backgroundColor: '#fff'}}>
-            <Text style={{color: '#1E90FF', fontSize: 17, zIndex: 23, marginRight: 14, paddingVertical: 13}}>CLOSE</Text>
+            <Text style={{color: '#1E90FF', fontSize: 17, zIndex: 23, marginRight: 16, paddingVertical: 13}}>CLOSE</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </Modal>
