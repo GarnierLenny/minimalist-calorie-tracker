@@ -130,6 +130,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       getIntake(intake.unitName);
     });
   }, [date]);
+
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
       {/* date section*/}
