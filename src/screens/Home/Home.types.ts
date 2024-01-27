@@ -31,4 +31,5 @@ export type ChangeValueButtonsProps = {
   date: Date;
   setIntakeTrack: any;
   selected: unit;
+  editGoal: boolean;
 };

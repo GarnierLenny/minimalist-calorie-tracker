@@ -86,15 +86,20 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
     const getIntake = async (name: string) => {
       try {
         const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
-        const stored = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
+        const stored: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
         const storedValue: number = stored === null ? 0 : Number(stored);
 
+        const storedGoal: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
+        let tempArray: unit[] = [...intakeTrack];
+
+        if (storedGoal !== null) {
+          tempArray[itemIndex].goal = Number(storedGoal);
+          setIntakeTrack(tempArray);
+        }
+
         if (stored === null) {
-          console.log('toto');
           await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, '0');
         } else {
-          let tempArray: unit[] = [...intakeTrack];
-
           tempArray[itemIndex].value = storedValue;
           setIntakeTrack(tempArray);
         }
@@ -119,7 +124,6 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       getIntake(intake.unitName);
     });
   }, [date]);
-
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
       {/* date section*/}
@@ -134,7 +138,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         }} iconName={!editGoal ? 'pencil' : 'target'} iconSize={20}  />
       </SafeAreaView>
       {/* Change cal val section*/}
-      <ChangeValueButtons selected={intakeTrack[selected]} setIntakeTrack={setIntakeTrack} date={date} />
+      <ChangeValueButtons selected={intakeTrack[selected]} setIntakeTrack={setIntakeTrack} date={date} editGoal={editGoal} />
       {/* Change selected intake section*/}
       <ChangeSection intakeTrack={intakeTrack} selected={intakeTrack[selected].unitName} setSelected={setSelected} />
     </SafeAreaView>
