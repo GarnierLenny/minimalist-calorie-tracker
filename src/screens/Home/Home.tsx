@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  useColorScheme,
+  Dimensions,
 } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,6 +28,7 @@ import ChangeSection from "./components/ChangeSection.component";
 import ChangeValueButtons from "./components/ChangeValueButtons.component";
 import DateSection from "./components/ChangeDate.component";
 import CustomButtonIcon from "../../utils/CustomButton/CustomButtonIcon.utils";
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 const HomeScreen = ({
   navigation,
@@ -157,29 +160,56 @@ const HomeScreen = ({
     });
   }, [date]);
 
+  const width = Dimensions.get('screen').width;
+
+  const [fill, setFill] = useState<number>(intakeTrack[selected].value * 100 / intakeTrack[selected].goal);
+
+  useEffect(() => {
+    const updateFill = () => {
+      setFill(intakeTrack[selected].value * 100 / intakeTrack[selected].goal);
+    };
+
+    console.log('updating fill');
+    updateFill();
+  }, [intakeTrack]);
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       {/* date section*/}
       <DateSection date={date} setDate={setDate} />
       {/* 0g / 2100g section*/}
-      <SafeAreaView style={styles.valueGoalContainer}>
-        <Animated.Text style={textValueStyle}>
-          {intakeTrack[selected].value}
-        </Animated.Text>
-        <Animated.Text style={textGoalStyle}>
-          /{intakeTrack[selected].goal}
-          {intakeTrack[selected].unitType}
-        </Animated.Text>
-        <SafeAreaView style={styles.valueGoalButton}>
-          <CustomButtonIcon
-            pressCallback={() => {
-              setEditGoal(!editGoal);
-              return editGoal ? focusGoal() : focusValue();
-            }}
-            iconName={!editGoal ? "pencil" : "target"}
-            iconSize={20}
-          />
+      <AnimatedCircularProgress
+        size={width * 0.7}
+        width={15}
+        fill={fill}
+        style={{alignSelf: 'center'}}
+        tintColor="#00e0ff"
+        // onAnimationComplete={() => console.log('onAnimationComplete')}
+        backgroundColor="#3d5875"
+      >
+        {
+        (fill) => (
+        <SafeAreaView style={styles.valueGoalContainer}>
+          <Animated.Text style={textValueStyle}>
+            {intakeTrack[selected].value}
+          </Animated.Text>
+          <Animated.Text style={textGoalStyle}>
+            /{intakeTrack[selected].goal}
+            {intakeTrack[selected].unitType}
+          </Animated.Text>
         </SafeAreaView>
+        )
+      }
+      </AnimatedCircularProgress>
+      <SafeAreaView style={styles.valueGoalButton}>
+        <CustomButtonIcon
+          pressCallback={() => {
+            setEditGoal(!editGoal);
+            return editGoal ? focusGoal() : focusValue();
+          }}
+          iconName={!editGoal ? "pencil" : "target"}
+          iconSize={20}
+        />
       </SafeAreaView>
       {/* Change cal val section*/}
       <ChangeValueButtons
