@@ -169,9 +169,8 @@ const HomeScreen = ({
       setFill(intakeTrack[selected].value * 100 / intakeTrack[selected].goal);
     };
 
-    console.log('updating fill');
     updateFill();
-  }, [intakeTrack]);
+  }, [intakeTrack, selected]);
 
   return (
     <SafeAreaView style={styles.mainContainer}>
