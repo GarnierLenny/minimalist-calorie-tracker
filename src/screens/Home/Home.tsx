@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Button, SafeAreaView, Text, StyleSheet, TouchableOpacity, View } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  Button,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import SafeAreaView from 'react-native-safe-area-view';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import IconButton from "../../utils/IconButton/IconButton.component";
-import styles from "./Home.styles";
 import { RootStackParamList } from "../../../App";
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Animated, { useSharedValue, FlipInEasyX, FlipOutEasyX, withTiming, Easing, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Animated, {
+  useSharedValue,
+  FlipInEasyX,
+  FlipOutEasyX,
+  withTiming,
+  Easing,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 import { unit, getSelectedType } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 import ChangeSection from "./components/ChangeSection.component";
@@ -14,25 +27,28 @@ import ChangeValueButtons from "./components/ChangeValueButtons.component";
 import DateSection from "./components/ChangeDate.component";
 import CustomButtonIcon from "../../utils/CustomButton/CustomButtonIcon.utils";
 
-const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
-   const [intakeTrack, setIntakeTrack] = useState<unit[]>([{
-      unitName: 'calories',
+const HomeScreen = ({
+  navigation,
+}: NativeStackScreenProps<RootStackParamList, "Home">) => {
+  const [intakeTrack, setIntakeTrack] = useState<unit[]>([
+    {
+      unitName: "calories",
       value: 0,
       goal: 2100,
-      unitType: 'cal',
+      unitType: "cal",
     },
     {
-      unitName: 'proteins',
+      unitName: "proteins",
       value: 0,
       goal: 100,
-      unitType: 'g',
+      unitType: "g",
     },
     {
-      unitName: 'water',
+      unitName: "water",
       value: 0,
       goal: 3000,
-      unitType: 'ml',
-    }
+      unitType: "ml",
+    },
   ]);
   const [selected, setSelected] = useState<number>(0);
   const [date, setDate] = useState<Date>(new Date());
@@ -89,12 +105,18 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
 
     const getIntake = async (name: string) => {
       try {
-        const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
-        const stored: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
+        const itemIndex = intakeTrack.findIndex(
+          (item) => item.unitName === name,
+        );
+        const stored: string | null = await AsyncStorage.getItem(
+          `${name}-${formatDate(date)}-value`,
+        );
         const storedValue: number = stored === null ? 0 : Number(stored);
 
         await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
-        const storedGoal: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
+        const storedGoal: string | null = await AsyncStorage.getItem(
+          `${name}-${formatDate(date)}-goal`,
+        );
         let tempArray: unit[] = [...intakeTrack];
 
         if (storedGoal !== null) {
@@ -103,7 +125,7 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         }
 
         if (stored === null) {
-          await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, '0');
+          await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, "0");
         } else {
           tempArray[itemIndex].value = storedValue;
           setIntakeTrack(tempArray);
@@ -115,12 +137,12 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
 
     const getLastSelected = async () => {
       try {
-        const lastSelected = await AsyncStorage.getItem('last-selected');
+        const lastSelected = await AsyncStorage.getItem("last-selected");
         if (lastSelected !== null) {
           setSelected(Number(lastSelected));
         }
       } catch {
-        console.error('Error in retrieving last selected');
+        console.error("Error in retrieving last selected");
       }
     };
 
@@ -132,24 +154,57 @@ const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }, [date]);
 
   return (
-    <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
+    <SafeAreaView style={styles.mainContainer}>
       {/* date section*/}
       <DateSection date={date} setDate={setDate} />
       {/* 0g / 2100g section*/}
-      <SafeAreaView style={{flexDirection: 'row', left: '2.5%', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
-        <Animated.Text style={textValueStyle}>{intakeTrack[selected].value}</Animated.Text>
-        <Animated.Text style={textGoalStyle}>/{intakeTrack[selected].goal}{intakeTrack[selected].unitType}</Animated.Text>
-        <CustomButtonIcon pressCallback={() => {
-          setEditGoal(!editGoal);
-          return editGoal ? focusGoal() : focusValue();
-        }} iconName={!editGoal ? 'pencil' : 'target'} iconSize={20}  />
+      <SafeAreaView style={styles.valueGoalContainer}>
+        <Animated.Text style={textValueStyle}>
+          {intakeTrack[selected].value}
+        </Animated.Text>
+        <Animated.Text style={textGoalStyle}>
+          /{intakeTrack[selected].goal}
+          {intakeTrack[selected].unitType}
+        </Animated.Text>
+        <SafeAreaView style={styles.valueGoalButton}>
+          <CustomButtonIcon
+            pressCallback={() => {
+              setEditGoal(!editGoal);
+              return editGoal ? focusGoal() : focusValue();
+            }}
+            iconName={!editGoal ? "pencil" : "target"}
+            iconSize={20}
+          />
+        </SafeAreaView>
       </SafeAreaView>
       {/* Change cal val section*/}
-      <ChangeValueButtons selected={intakeTrack[selected]} setIntakeTrack={setIntakeTrack} date={date} editGoal={editGoal} />
+      <ChangeValueButtons
+        selected={intakeTrack[selected]}
+        setIntakeTrack={setIntakeTrack}
+        date={date}
+        editGoal={editGoal}
+      />
       {/* Change selected intake section*/}
-      <ChangeSection intakeTrack={intakeTrack} selected={intakeTrack[selected].unitName} setSelected={setSelected} />
+      <ChangeSection
+        intakeTrack={intakeTrack}
+        selected={intakeTrack[selected].unitName}
+        setSelected={setSelected}
+      />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  mainContainer: { display: "flex", justifyContent: "center", flex: 1 },
+  valueGoalContainer: {
+    flexDirection: "row",
+    paddingVertical: 50,
+    justifyContent: "center",
+    gap: 10,
+    alignItems: "flex-end",
+    backgroundColor: "rgba(255, 120, 0, 0)",
+  },
+  valueGoalButton: { position: "absolute", right: "10%", alignSelf: "center" },
+});
 
 export default HomeScreen;
