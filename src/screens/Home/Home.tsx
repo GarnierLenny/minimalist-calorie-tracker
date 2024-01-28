@@ -53,48 +53,52 @@ const HomeScreen = ({
   const [selected, setSelected] = useState<number>(0);
   const [date, setDate] = useState<Date>(new Date());
   const [editGoal, setEditGoal] = useState<boolean>(true);
-
-  const valueFontSize = useSharedValue(43);
-  const valueFontWeight = useSharedValue(600);
-  const valueMarginBottom = useSharedValue(0);
-
-  const goalFontSize = useSharedValue(20);
-  const goalFontWeight = useSharedValue(400);
-  const goalMarginBotton = useSharedValue(8);
+  const shared = {
+    value: {
+      fontSize: useSharedValue(43),
+      fontWeight: useSharedValue(600),
+      marginBottom: useSharedValue(0),
+    },
+    goal: {
+      fontSize: useSharedValue(20),
+      fontWeight: useSharedValue(400),
+      marginBottom: useSharedValue(8),
+    },
+  }
 
   const focusValue = () => {
-    valueFontWeight.value = 600;
-    goalFontWeight.value = 400;
-    valueMarginBottom.value = withTiming(0);
-    goalMarginBotton.value = withTiming(8);
+    shared.value.fontWeight.value = 600;
+    shared.goal.fontWeight.value = 400;
+    shared.value.marginBottom.value = withTiming(0);
+    shared.goal.marginBottom.value = withTiming(8);
 
-    valueFontSize.value = withSpring(43);
-    goalFontSize.value = withSpring(20);
+    shared.value.fontSize.value = withSpring(43);
+    shared.goal.fontSize.value = withSpring(20);
   };
 
   const focusGoal = () => {
-    valueFontWeight.value = 400;
-    goalFontWeight.value = 600;
-    valueMarginBottom.value = withTiming(10);
-    goalMarginBotton.value = withTiming(-5);
+    shared.value.fontWeight.value = 400;
+    shared.goal.fontWeight.value = 600;
+    shared.value.marginBottom.value = withTiming(10);
+    shared.goal.marginBottom.value = withTiming(-5);
 
-    valueFontSize.value = withSpring(20);
-    goalFontSize.value = withSpring(43);
+    shared.value.fontSize.value = withSpring(20);
+    shared.goal.fontSize.value = withSpring(43);
   };
 
   const textValueStyle = useAnimatedStyle(() => {
     return {
-      fontWeight: valueFontWeight.value.toString(),
-      fontSize: valueFontSize.value,
-      marginBottom: valueMarginBottom.value,
+      fontWeight: shared.value.fontWeight.value.toString(),
+      fontSize: shared.value.fontSize.value,
+      marginBottom: shared.value.marginBottom.value,
     };
   });
 
   const textGoalStyle = useAnimatedStyle(() => {
     return {
-      fontWeight: goalFontWeight.value.toString(),
-      fontSize: goalFontSize.value,
-      marginBottom: goalMarginBotton.value,
+      fontWeight: shared.goal.fontWeight.value.toString(),
+      fontSize: shared.goal.fontSize.value,
+      marginBottom: shared.goal.marginBottom.value,
     };
   });
 

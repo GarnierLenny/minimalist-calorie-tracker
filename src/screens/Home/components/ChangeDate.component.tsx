@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   popup: { borderRadius: 20 },
   closeButtonText: {
     color: "#1E90FF",
-    fontSize: 17,
+    fontSize: 15,
     zIndex: 23,
     marginRight: 16,
     paddingVertical: 13,
