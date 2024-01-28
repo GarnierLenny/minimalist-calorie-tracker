@@ -1,69 +1,153 @@
 import React, { useEffect, useState } from "react";
-import { Button, SafeAreaView, Text, StyleSheet } from "react-native";
+import { Button, SafeAreaView, Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import IconButton from "../../utils/IconButton.component";
+import IconButton from "../../utils/IconButton/IconButton.component";
 import styles from "./Home.styles";
 import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Animated, { useSharedValue, FlipInEasyX, FlipOutEasyX, withTiming, Easing, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { unit, getSelectedType } from "./Home.types";
+import { formatDate } from "../../utils/formatDate";
+import ChangeSection from "./components/ChangeSection.component";
+import ChangeValueButtons from "./components/ChangeValueButtons.component";
+import DateSection from "./components/ChangeDate.component";
+import CustomButtonIcon from "../../utils/CustomButton/CustomButtonIcon.utils";
 
 const HomeScreen = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) => {
-  const [calories, setCalories] = useState<number>(0);
+   const [intakeTrack, setIntakeTrack] = useState<unit[]>([{
+      unitName: 'calories',
+      value: 0,
+      goal: 2100,
+      unitType: 'cal',
+    },
+    {
+      unitName: 'proteins',
+      value: 0,
+      goal: 100,
+      unitType: 'g',
+    },
+    {
+      unitName: 'water',
+      value: 0,
+      goal: 3000,
+      unitType: 'ml',
+    }
+  ]);
+  const [selected, setSelected] = useState<number>(0);
   const [date, setDate] = useState<Date>(new Date());
+  const [editGoal, setEditGoal] = useState<boolean>(true);
+
+  const valueFontSize = useSharedValue(43);
+  const valueFontWeight = useSharedValue(600);
+  const valueMarginBottom = useSharedValue(0);
+
+  const goalFontSize = useSharedValue(20);
+  const goalFontWeight = useSharedValue(400);
+  const goalMarginBotton = useSharedValue(8);
+
+  const focusValue = () => {
+    valueFontWeight.value = 600;
+    goalFontWeight.value = 400;
+    valueMarginBottom.value = withTiming(0);
+    goalMarginBotton.value = withTiming(8);
+
+    valueFontSize.value = withSpring(43);
+    goalFontSize.value = withSpring(20);
+  };
+
+  const focusGoal = () => {
+    valueFontWeight.value = 400;
+    goalFontWeight.value = 600;
+    valueMarginBottom.value = withTiming(10);
+    goalMarginBotton.value = withTiming(-5);
+
+    valueFontSize.value = withSpring(20);
+    goalFontSize.value = withSpring(43);
+  };
+
+  const textValueStyle = useAnimatedStyle(() => {
+    return {
+      fontWeight: valueFontWeight.value.toString(),
+      fontSize: valueFontSize.value,
+      marginBottom: valueMarginBottom.value,
+    };
+  });
+
+  const textGoalStyle = useAnimatedStyle(() => {
+    return {
+      fontWeight: goalFontWeight.value.toString(),
+      fontSize: goalFontSize.value,
+      marginBottom: goalMarginBotton.value,
+    };
+  });
 
   useEffect(() => {
-    const getCalories = async () => {
+    const setDefaultGoals = async (name: string, value: string) => {
+      await AsyncStorage.setItem(`${name}-defaultgoal`, value);
+    };
+
+    const getIntake = async (name: string) => {
       try {
-        const formatDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-        const storedCalories = await AsyncStorage.getItem(`calories-${formatDate}`);
-        if (storedCalories !== null) {
-          setCalories(JSON.parse(storedCalories));
+        const itemIndex = intakeTrack.findIndex((item) => item.unitName === name);
+        const stored: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-value`);
+        const storedValue: number = stored === null ? 0 : Number(stored);
+
+        await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
+        const storedGoal: string | null = await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
+        let tempArray: unit[] = [...intakeTrack];
+
+        if (storedGoal !== null) {
+          tempArray[itemIndex].goal = Number(storedGoal);
+          setIntakeTrack(tempArray);
+        }
+
+        if (stored === null) {
+          await AsyncStorage.setItem(`${name}-${formatDate(date)}-value`, '0');
         } else {
-          setCalories(0);
+          tempArray[itemIndex].value = storedValue;
+          setIntakeTrack(tempArray);
         }
       } catch (err) {
         console.log(err);
       }
     };
 
-    getCalories();
-  }, [date]);
-
-
-  const handleCalorieChange = async (increment: number) => {
-    setCalories((prevCalories) => {
-      const newCalories = prevCalories + increment;
-      const formatDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+    const getLastSelected = async () => {
       try {
-        AsyncStorage.setItem(`calories-${formatDate}`, JSON.stringify(newCalories));
-      } catch (err) {
-        console.log('Error in storing new calories value', err);
+        const lastSelected = await AsyncStorage.getItem('last-selected');
+        if (lastSelected !== null) {
+          setSelected(Number(lastSelected));
+        }
+      } catch {
+        console.error('Error in retrieving last selected');
       }
-      return newCalories;
+    };
+
+    getLastSelected();
+    intakeTrack.map((intake: unit) => {
+      setDefaultGoals(intake.unitName, intake.goal.toString());
+      getIntake(intake.unitName);
     });
-  };
-
-  const changeDateHandler = (increment: number) => {
-    setDate(oldDate => {
-      const newDate = new Date(oldDate);
-
-      newDate.setDate(newDate.getDate() + increment);
-      return newDate;
-    })
-  }
+  }, [date]);
 
   return (
     <SafeAreaView style={{display: 'flex', justifyContent: 'center', flex: 1}}>
-      <SafeAreaView style={styles.dateContainer}>
-        <IconButton name="arrow-left-bold-circle" size={25} callback={() => changeDateHandler(-1)} />
-        <Text style={styles.dateText}>{date.getDate()}/{date.getMonth() + 1}/
-        {date.getFullYear()}</Text>
-        <IconButton name="arrow-right-bold-circle" size={25} callback={() => changeDateHandler(+1)} />
+      {/* date section*/}
+      <DateSection date={date} setDate={setDate} />
+      {/* 0g / 2100g section*/}
+      <SafeAreaView style={{flexDirection: 'row', left: '2.5%', paddingVertical: 50, justifyContent: 'center', alignItems: 'flex-end', gap: 15, backgroundColor: 'rgba(255, 120, 0, 0)'}}>
+        <Animated.Text style={textValueStyle}>{intakeTrack[selected].value}</Animated.Text>
+        <Animated.Text style={textGoalStyle}>/{intakeTrack[selected].goal}{intakeTrack[selected].unitType}</Animated.Text>
+        <CustomButtonIcon pressCallback={() => {
+          setEditGoal(!editGoal);
+          return editGoal ? focusGoal() : focusValue();
+        }} iconName={!editGoal ? 'pencil' : 'target'} iconSize={20}  />
       </SafeAreaView>
-      <SafeAreaView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', gap: 20 }}>
-        <Button title="-" onPress={() => handleCalorieChange(-10)} />
-        <Text style={{ fontSize: 20, alignSelf: 'center' }}>{calories}</Text>
-        <Button title="+" onPress={() => handleCalorieChange(+10)} />
-      </SafeAreaView>
+      {/* Change cal val section*/}
+      <ChangeValueButtons selected={intakeTrack[selected]} setIntakeTrack={setIntakeTrack} date={date} editGoal={editGoal} />
+      {/* Change selected intake section*/}
+      <ChangeSection intakeTrack={intakeTrack} selected={intakeTrack[selected].unitName} setSelected={setSelected} />
     </SafeAreaView>
   );
 };
