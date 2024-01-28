@@ -17,18 +17,13 @@ const DateSection = ({date, setDate}: DateSectionProps) => {
   const rotateX = useSharedValue(0);
   const [referenceDate] = useState<string>(formatDate(date));
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-
-  // const animatedStyle = useAnimatedStyle(() => (
-  //   {transform: [{ perspective: 500 }, { rotateX: `${rotateX.value}deg` }]}
-  // ));
+  let maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() - 1);
 
   const changeDateHandler = (increment: number) => {
     setDate((oldDate: Date) => {
       const newDate = new Date(oldDate);
 
-      // rotateX.value = withTiming(90, { duration: 100, easing: Easing.linear }, () => {
-      //   rotateX.value = withTiming(0, { duration: 100, easing: Easing.linear });
-      // });
       newDate.setDate(newDate.getDate() + increment);
       return newDate;
     })
@@ -47,7 +42,7 @@ const DateSection = ({date, setDate}: DateSectionProps) => {
         <Calendar
         enableSwipeMonths={true}
         style={{paddingTop: 20, paddingBottom: 20, borderTopLeftRadius: 5, borderTopRightRadius: 5}}
-        maxDate={new Date().toString()}
+        maxDate={maxDate.toString()}
         onDayPress={(day) => {
           const newDate = new Date(day.dateString);
           setDate(newDate);
