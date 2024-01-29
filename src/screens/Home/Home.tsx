@@ -172,6 +172,11 @@ const HomeScreen = ({
     updateFill();
   }, [intakeTrack, selected]);
 
+  const capitalizeFirstLetter = (string: string): string => {
+    return string.charAt(0).toUpperCase() +
+    string.slice(1, string.length);
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       {/* date section*/}
@@ -179,9 +184,9 @@ const HomeScreen = ({
       {/* 0g / 2100g section*/}
       <AnimatedCircularProgress
         size={width * 0.7}
-        width={15}
+        width={17}
         fill={fill}
-        style={{alignSelf: 'center'}}
+        style={{alignSelf: 'center', marginBottom: 40}}
         tintColor="#00e0ff"
         // onAnimationComplete={() => console.log('onAnimationComplete')}
         backgroundColor="#3d5875"
@@ -206,10 +211,21 @@ const HomeScreen = ({
             setEditGoal(!editGoal);
             return editGoal ? focusGoal() : focusValue();
           }}
+          text={'Edit ' + (!editGoal ? 'intake' : 'goal')}
           iconName={!editGoal ? "pencil" : "target"}
           iconSize={20}
         />
       </SafeAreaView>
+      {/* <SafeAreaView style={{
+          flexDirection: 'row',
+          paddingBottom: 20,
+          width: '57%',
+          alignSelf: 'center',
+          justifyContent: 'space-evenly',
+          // backgroundColor: '#033',
+        }}>
+        <Text style={styles.selectionText}>{capitalizeFirstLetter(intakeTrack[selected].unitName)}</Text>
+      </SafeAreaView> */}
       {/* Change cal val section*/}
       <ChangeValueButtons
         selected={intakeTrack[selected]}
@@ -228,7 +244,14 @@ const HomeScreen = ({
 };
 
 const styles = StyleSheet.create({
-  mainContainer: { display: "flex", justifyContent: "center", flex: 1 },
+  selectionText: {
+    fontSize: 15,
+  },
+  mainContainer: {
+    display: "flex",
+    justifyContent: "center",
+    flex: 1,
+  },
   valueGoalContainer: {
     flexDirection: "row",
     paddingVertical: 50,
@@ -237,7 +260,12 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     backgroundColor: "rgba(255, 120, 0, 0)",
   },
-  valueGoalButton: { position: "absolute", right: "10%", alignSelf: "center" },
+  valueGoalButton: {
+    alignSelf: 'flex-end',
+    right: '5%',
+    marginBottom: 10,
+    top: '-4%',
+  },
 });
 
 export default HomeScreen;

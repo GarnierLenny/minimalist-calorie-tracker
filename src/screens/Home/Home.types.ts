@@ -18,6 +18,7 @@ export type customButtonIconProps = {
   iconSize: number;
   paddingInc?: number;
   disabled?: boolean;
+  text?: string;
 };
 
 export type unit = {

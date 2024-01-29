@@ -10,6 +10,7 @@ const CustomButtonIcon = ({
   iconSize,
   paddingInc = 0,
   disabled = false,
+  text = '',
 }: customButtonIconProps) => {
   const [pressed, setPressed] = useState<boolean>(false);
 
@@ -21,6 +22,11 @@ const CustomButtonIcon = ({
           paddingVertical: 16 + paddingInc
         }}
       >
+        {
+          text.length !== 0 && (
+            <Text style={{...styles.buttonText, color: "rgba(255, 255, 255, 0.4)"}}>{text}</Text>
+          )
+        }
         <Icon
           name={iconName}
           size={iconSize}
@@ -38,6 +44,11 @@ const CustomButtonIcon = ({
         onPressOut={() => setPressed(false)}
         onPress={pressCallback}
       >
+        {
+          text.length !== 0 && (
+            <Text style={styles.buttonText}>{text}</Text>
+          )
+        }
         <Icon name={iconName} size={iconSize} />
       </TouchableOpacity>
     </SafeAreaView>
@@ -49,17 +60,22 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#000",
     borderRadius: 10,
+    flexDirection: 'row',
     zIndex: -1,
     top: 5,
+    gap:10,
   },
   frontLayerContainer: {
     borderWidth: 1,
     backgroundColor: "#fff",
     borderRadius: 10,
     display: "flex",
+    flexDirection: 'row',
     zIndex: 1,
+    gap:10,
     alignItems: "center",
   },
+  buttonText: {fontWeight: '600', fontSize: 15},
 });
 
 export default CustomButtonIcon;

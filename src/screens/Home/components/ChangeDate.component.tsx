@@ -37,8 +37,8 @@ const DateSection = ({ date, setDate }: DateSectionProps) => {
   return (
     <SafeAreaView style={styles.dateContainer}>
       <IconButton
-        name="arrow-left-bold-circle"
-        size={25}
+        name="less-than"
+        size={26}
         callback={() => changeDateHandler(-1)}
       />
       <Modal
@@ -83,8 +83,8 @@ const DateSection = ({ date, setDate }: DateSectionProps) => {
       <IconButton
         color="#000"
         disabled={formatDate(date) === referenceDate ? true : false}
-        name="arrow-right-bold-circle"
-        size={25}
+        name="greater-than"
+        size={26}
         callback={() => changeDateHandler(+1)}
       />
     </SafeAreaView>
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 20,
+    fontWeight: '500',
   },
   calendar: {
     paddingTop: 20,
@@ -118,10 +119,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   dateTextContainer: {
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   popup: { borderRadius: 20 },
   closeButtonText: {
