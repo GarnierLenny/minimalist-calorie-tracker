@@ -1,25 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import Animated, { FlipInEasyX, FlipOutEasyX } from "react-native-reanimated";
 import { unit } from "../Home.types";
+import { IntakeContext } from "../../../context/Intake.context";
 
 type ChangeSelectButtonProps = {
   targetSelection: string;
 };
 
-type ChangeSectionProps = {
-  intakeTrack: unit[];
-  selected: string;
-  setSelected: React.Dispatch<React.SetStateAction<number>>;
-};
-
-const ChangeSection = ({
-  intakeTrack,
-  selected,
-  setSelected,
-}: ChangeSectionProps) => {
+const ChangeSection = () => {
+  const { intakeTrack, selected, setSelected } = useContext(IntakeContext);
+  const selectedString = intakeTrack[selected].unitName;
   const changeSelected = async (newSelected: number) => {
     setSelected(newSelected);
     AsyncStorage.setItem("last-selected", newSelected.toString());
@@ -48,7 +41,7 @@ const ChangeSection = ({
   return (
     <SafeAreaView style={styles.mainContainer} >
       {intakeTrack.map((item, index) => {
-        return item.unitName === selected ? (
+        return item.unitName === selectedString ? (
           <Animated.View
             key={index}
             style={styles.mapItem}
@@ -56,8 +49,8 @@ const ChangeSection = ({
             exiting={FlipOutEasyX}
           >
             <Text style={styles.mapItemText}>
-              {selected.charAt(0).toUpperCase() +
-                selected.slice(1, selected.length)}
+              {selectedString.charAt(0).toUpperCase() +
+                selectedString.slice(1, selectedString.length)}
             </Text>
           </Animated.View>
         ) : (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import IconButton from "../../../utils/IconButton/IconButton.component";
@@ -12,19 +12,16 @@ import { formatDate } from "../../../utils/formatDate";
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { IntakeContext } from "../../../context/Intake.context";
 
-type DateSectionProps = {
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-};
-
-const DateSection = ({ date, setDate }: DateSectionProps) => {
-  const rotateX = useSharedValue(0);
+const DateSection = () => {
+  const {date, setDate} = useContext(IntakeContext);
   const [referenceDate] = useState<string>(formatDate(date));
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  let maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() - 1);
 
+  let maxDate = new Date();
+
+  maxDate.setDate(maxDate.getDate() - 1);
   const changeDateHandler = (increment: number) => {
     setDate((oldDate: Date) => {
       const newDate = new Date(oldDate);

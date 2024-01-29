@@ -27,10 +27,3 @@ export type unit = {
   unitName: string;
   unitType: string;
 };
-
-export type ChangeValueButtonsProps = {
-  date: Date;
-  setIntakeTrack: any;
-  selected: unit;
-  editGoal: boolean;
-};

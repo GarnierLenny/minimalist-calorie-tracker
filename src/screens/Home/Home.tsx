@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
-  Button,
-  Text,
   StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
   Dimensions,
 } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import IconButton from "../../utils/IconButton/IconButton.component";
 import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { IntakeContext } from "../../context/Intake.context";
 import Animated, {
   useSharedValue,
-  FlipInEasyX,
-  FlipOutEasyX,
   withTiming,
-  Easing,
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
-import { unit, getSelectedType } from "./Home.types";
+import { unit } from "./Home.types";
 import { formatDate } from "../../utils/formatDate";
 import ChangeSection from "./components/ChangeSection.component";
 import ChangeValueButtons from "./components/ChangeValueButtons.component";
@@ -33,29 +25,16 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 const HomeScreen = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Home">) => {
-  const [intakeTrack, setIntakeTrack] = useState<unit[]>([
-    {
-      unitName: "calories",
-      value: 0,
-      goal: 2100,
-      unitType: "cal",
-    },
-    {
-      unitName: "proteins",
-      value: 0,
-      goal: 100,
-      unitType: "g",
-    },
-    {
-      unitName: "water",
-      value: 0,
-      goal: 3000,
-      unitType: "ml",
-    },
-  ]);
-  const [selected, setSelected] = useState<number>(0);
-  const [date, setDate] = useState<Date>(new Date());
-  const [editGoal, setEditGoal] = useState<boolean>(true);
+  const {
+    intakeTrack,
+    setIntakeTrack,
+    selected,
+    setSelected,
+    date,
+    setDate,
+    editGoal,
+    setEditGoal,
+  } = useContext(IntakeContext);
   const shared = {
     value: {
       fontSize: useSharedValue(43),
@@ -180,7 +159,7 @@ const HomeScreen = ({
   return (
     <SafeAreaView style={styles.mainContainer}>
       {/* date section*/}
-      <DateSection date={date} setDate={setDate} />
+      <DateSection />
       {/* 0g / 2100g section*/}
       <AnimatedCircularProgress
         size={width * 0.7}
@@ -216,29 +195,9 @@ const HomeScreen = ({
           iconSize={20}
         />
       </SafeAreaView>
-      {/* <SafeAreaView style={{
-          flexDirection: 'row',
-          paddingBottom: 20,
-          width: '57%',
-          alignSelf: 'center',
-          justifyContent: 'space-evenly',
-          // backgroundColor: '#033',
-        }}>
-        <Text style={styles.selectionText}>{capitalizeFirstLetter(intakeTrack[selected].unitName)}</Text>
-      </SafeAreaView> */}
-      {/* Change cal val section*/}
-      <ChangeValueButtons
-        selected={intakeTrack[selected]}
-        setIntakeTrack={setIntakeTrack}
-        date={date}
-        editGoal={editGoal}
-      />
+      <ChangeValueButtons />
       {/* Change selected intake section*/}
-      <ChangeSection
-        intakeTrack={intakeTrack}
-        selected={intakeTrack[selected].unitName}
-        setSelected={setSelected}
-      />
+      <ChangeSection />
     </SafeAreaView>
   );
 };

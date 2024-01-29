@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { unit, ChangeValueButtonsProps } from "../Home.types";
+import { unit } from "../Home.types";
 import { formatDate } from "../../../utils/formatDate";
 import CustomButtonText from "../../../utils/CustomButton/CustomButtonText.utils";
+import { IntakeContext } from "../../../context/Intake.context";
 
 const changeSelectedAmount = (
   newValue: number,
@@ -16,11 +17,11 @@ const changeSelectedAmount = (
   setter((prevArr: unit[]) => {
     let tempArray: unit[] = [...prevArr];
 
-    if (valueGoal === "value")
+    if (valueGoal === "value") {
       tempArray[
         tempArray.findIndex((item) => item.unitName === selected.unitName)
       ].value = newValue;
-    else
+    } else
       tempArray[
         tempArray.findIndex((item) => item.unitName === selected.unitName)
       ].goal = newValue;
@@ -36,18 +37,22 @@ const changeSelectedAmount = (
   });
 };
 
-const ChangeValueButtons = ({
-  date,
-  setIntakeTrack,
-  selected,
-  editGoal,
-}: ChangeValueButtonsProps) => {
-  const valueGoal = !editGoal ? "goal" : "value";
+const ChangeValueButtons = () => {
+  const {
+    selected,
+    intakeTrack,
+    setIntakeTrack,
+    date,
+    editGoal,
+  } = useContext(IntakeContext);
+  const valueGoal = !editGoal ? 'goal' : 'value';
+  const selectedUnit = intakeTrack[selected];
   const editCallback = (value: number) => {
-    const newValue = !editGoal ? selected.goal + value : selected.value + value;
+    const newValue = !editGoal ? selectedUnit.goal + value : selectedUnit.value + value;
+
     changeSelectedAmount(
       newValue < 0 ? 0 : newValue,
-      selected,
+      selectedUnit,
       date,
       setIntakeTrack,
       valueGoal,
@@ -61,25 +66,24 @@ const ChangeValueButtons = ({
           textContent="-100"
           pressCallback={() => editCallback(-100)}
           paddingInc={5}
-          disabled={!editGoal ? selected.goal === 0 : selected.value === 0}
+          disabled={!editGoal ? selectedUnit.goal === 0 : selectedUnit.value === 0}
         />
         <CustomButtonText
           textContent="-10"
           pressCallback={() => editCallback(-10)}
-          disabled={!editGoal ? selected.goal === 0 : selected.value === 0}
+          disabled={!editGoal ? selectedUnit.goal === 0 : selectedUnit.value === 0}
         />
       </SafeAreaView>
       <TouchableOpacity
         onPress={async () => {
           const newAmount = !editGoal
             ? Number(
-                await AsyncStorage.getItem(`${selected.unitName}-defaultgoal`),
+                await AsyncStorage.getItem(`${selectedUnit.unitName}-defaultgoal`),
               )
             : 0;
-
           return changeSelectedAmount(
             newAmount,
-            selected,
+            selectedUnit,
             date,
             setIntakeTrack,
             valueGoal,
