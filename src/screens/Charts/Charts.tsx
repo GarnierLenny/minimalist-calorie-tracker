@@ -6,96 +6,38 @@ import { unit } from '../Home/Home.types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDate } from '../../utils/formatDate';
 import { IntakeContext } from '../../context/Intake.context';
+import ChangeSection from '../Home/components/ChangeSection.component';
+import { valuesGoalDatesObject, heatData, heatValue } from './Charts.types';
 
-type chartMap = {
-  span: string;
-  chart: JSX.Element;
-}
-
-type spanType = {
-  timespans: chartMap[];
-  selected: number;
-};
-
-type heatSpan = {
-  lowerBound: number;
-  upperBound: number;
-  value: number;
-};
-
-const heatValue: heatSpan[] = [
-  {
-    lowerBound: 0,
-    upperBound: 0,
-    value: 0,
-  },
-  {
-    lowerBound: 1,
-    upperBound: 20,
-    value: 1,
-  },
-  {
-    lowerBound: 21,
-    upperBound: 40,
-    value: 2,
-  },
-  {
-    lowerBound: 41,
-    upperBound: 60,
-    value: 3,
-  },
-  {
-    lowerBound: 61,
-    upperBound: 80,
-    value: 4,
-  },
-  {
-    lowerBound: 81,
-    upperBound: 100,
-    value: 5,
-  },
-  {
-    lowerBound: 101,
-    upperBound: 999,
-    value: 1,
-  },
-];
-
-type intake90days = {
-  calories: number[];
-  proteins: number[];
-  water: number[];
-};
-
-type heatData = {
-  date: string;
-  count: number | undefined;
-};
-
-const retrieve90days = async (): Promise<heatData[]> => {
-  let result: intake90days = {
-    calories: [],
-    proteins: [],
-    water: [],
-  };
-  const baseDate: Date = new Date();
-  baseDate.setDate(baseDate.getDate() - 89);
-
+const getValuesGoalsDates = (name: string): valuesGoalDatesObject => {
   const values: string[] = [];
   const goals: string[] = [];
   const dates: string[] = [];
+  const baseDate: Date = new Date();
 
+  baseDate.setDate(baseDate.getDate() - 89);
   for (let i = 0; i < 90; i++) {
     dates.push(formatDate(baseDate));
 
-    values.push(`calories-${dates[i]}-value`);
-    goals.push(`calories-${dates[i]}-goal`);
+    values.push(`${name}-${dates[i]}-value`);
+    goals.push(`${name}-${dates[i]}-goal`);
     baseDate.setDate(baseDate.getDate() + 1);
   };
-  const caloriesValues = await AsyncStorage.multiGet(values);
-  const caloriesGoals = await AsyncStorage.multiGet(goals);
-  const defaultGoal = await AsyncStorage.getItem('calories-defaultgoal');
 
+  return {
+    values,
+    goals,
+    dates,
+  };
+};
+
+const retrieve90days = async (name: string): Promise<heatData[]> => {
+  const { values, goals, dates } = getValuesGoalsDates(name);
+
+
+  const queryValues = await AsyncStorage.multiGet(values);
+  const queryGoals = await AsyncStorage.multiGet(goals);
+  const defaultGoal = await AsyncStorage.getItem(`${name}-defaultgoal`);
   const caloriesHeat: heatData[] = [];
 
   const scoreToHeat = (score: number): number | undefined => {
@@ -103,11 +45,11 @@ const retrieve90days = async (): Promise<heatData[]> => {
   };
 
   for (let i = 0; i < 90; i++) {
-    if (caloriesValues[i][1] !== null) {
-      const score: number | undefined = caloriesGoals[i][1] === null ?
-      scoreToHeat(Math.round(Number(caloriesValues[i][1]) * 100 / Number(defaultGoal)))
+    if (queryValues[i][1] !== null) {
+      const score: number | undefined = queryGoals[i][1] === null ?
+      scoreToHeat(Math.round(Number(queryValues[i][1]) * 100 / Number(defaultGoal)))
       :
-      scoreToHeat(Math.round(Number(caloriesValues[i][1]) * 100 / Number(caloriesGoals[i][1])));
+      scoreToHeat(Math.round(Number(queryValues[i][1]) * 100 / Number(queryGoals[i][1])));
 
       caloriesHeat.push({
         date: dates[i],
@@ -118,18 +60,27 @@ const retrieve90days = async (): Promise<heatData[]> => {
   return caloriesHeat;
 };
 
-const BarChartRender = () => {
+const HeatMapRender = () => {
   const {
     intakeTrack,
   } = useContext(IntakeContext);
-  const [quarterYearData, setQuarterYearData] = useState<heatData[]>([]);
-  let data = [];
+  const [quarterYearData, setQuarterYearData] = useState<heatData[][]>([]);
+  const { selected } = useContext(IntakeContext);
 
   useEffect(() => {
     const callAndAssign = async () => {
-      const res = await retrieve90days();
+      const calories = await retrieve90days('calories');
+      const proteins = await retrieve90days('proteins');
+      const water = await retrieve90days('water');
 
-      setQuarterYearData(res);
+      setQuarterYearData((old: heatData[][]) => {
+        const newArr: heatData[][] = [...old];
+
+        newArr.push(calories);
+        newArr.push(proteins);
+        newArr.push(water);
+        return newArr;
+      });
     };
 
     callAndAssign();
@@ -148,7 +99,7 @@ const BarChartRender = () => {
   return (
     <SafeAreaView>
       <ContributionGraph
-        values={quarterYearData}
+        values={quarterYearData[selected] === undefined ? [{}] : quarterYearData[selected]}
         endDate={new Date()}
         numDays={105}
         width={screenWidth}
@@ -160,33 +111,11 @@ const BarChartRender = () => {
 };
 
 const ChartsScreen = () => {
-  const [spans, setSpans] = useState<spanType>({
-  timespans: [
-    {span: '7 days', chart: <BarChartRender />},
-    {span: '1 month', chart: <BarChartRender />},
-    {span: '3 months', chart: <BarChartRender />},
-    ],
-    selected: 0,
-  });
-
-  return (
+return (
     <SafeAreaView style={styles.mainContainer}>
-      {/* Timespan select section */}
-      <SafeAreaView style={styles.timespanContainer}>
-        <TouchableOpacity
-          onPress={() => setSpans((old) => ({...spans, selected: old.selected - 1 < 0 ? spans.timespans.length - 1 : old.selected - 1}))}
-        >
-          <Icon name="less-than" size={26} />
-        </TouchableOpacity>
-        <Text style={styles.timespanText}>{spans.timespans[spans.selected].span}</Text>
-        <TouchableOpacity
-          onPress={() => setSpans((old) => ({...spans, selected: old.selected + 1 === spans.timespans.length ? 0 : old.selected + 1}))}
-        >
-          <Icon name="greater-than" size={26} />
-        </TouchableOpacity>
-      </SafeAreaView>
-      {/* Chart section */}
-      {spans.timespans[spans.selected].chart}
+      <Text style={styles.dailyText}>Daily consistency</Text>
+      <HeatMapRender />
+      <ChangeSection />
     </SafeAreaView>
   );
 };
@@ -205,6 +134,12 @@ const styles = StyleSheet.create({
   },
   timespanText: {
     fontSize: 20,
+  },
+  dailyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginVertical: 10,
+    marginLeft: 10,
   },
 });
 
