@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, RouteProp } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./src/screens/Home/Home";
 import ChartsScreen from "./src/screens/Charts/Charts";
@@ -10,9 +10,10 @@ import { useState } from "react";
 import { unit } from "./src/screens/Home/Home.types";
 import { IntakeContext } from "./src/context/Intake.context";
 
+
 export type RootStackParamList = {
   Home: undefined;
-  Charts: undefined;
+  Charts: { intakeTrack: unit[] };
   BMR: undefined;
 };
 
@@ -58,16 +59,6 @@ export default function App() {
       <NavigationContainer>
         <Tab.Navigator>
           <Tab.Screen
-            name="Charts"
-            component={ChartsScreen}
-            options={{
-              tabBarLabel: 'Intake',
-              tabBarIcon: ({ color, size }) => (
-                <Icon name="chart-bar" color={color} size={size} />
-              ),
-            }}
-          />
-          <Tab.Screen
             name="Home"
             component={HomeScreen}
             options={{
@@ -76,7 +67,18 @@ export default function App() {
                 <Icon name="checkbox-multiple-blank-circle-outline" color={color} size={size} />
               ),
             }}
-            />
+          />
+          <Tab.Screen
+            name="Charts"
+            initialParams={{intakeTrack}}
+            component={ChartsScreen}
+            options={{
+              tabBarLabel: 'Intake',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="chart-bar" color={color} size={size} />
+              ),
+            }}
+          />
           <Tab.Screen
           name="BMR"
           component={BMRScreen}

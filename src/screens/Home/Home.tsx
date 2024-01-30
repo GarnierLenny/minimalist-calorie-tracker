@@ -99,7 +99,7 @@ const HomeScreen = ({
         );
         const storedValue: number = stored === null ? 0 : Number(stored);
 
-        await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
+        // await AsyncStorage.getItem(`${name}-${formatDate(date)}-goal`);
         const storedGoal: string | null = await AsyncStorage.getItem(
           `${name}-${formatDate(date)}-goal`,
         );
