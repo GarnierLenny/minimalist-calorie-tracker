@@ -109,18 +109,12 @@ const retrieve90days = async (): Promise<heatData[]> => {
       :
       scoreToHeat(Math.round(Number(caloriesValues[i][1]) * 100 / Number(caloriesGoals[i][1])));
 
-      // caloriesHeat.push({
-      //   date: dates[i],
-      //   count: 0,
-      // })
       caloriesHeat.push({
         date: dates[i],
         count: score,
       });
     }
   };
-  // result.calories = caloriesHeat;
-  console.log('calories', caloriesHeat);
   return caloriesHeat;
 };
 
@@ -128,23 +122,8 @@ const BarChartRender = () => {
   const {
     intakeTrack,
   } = useContext(IntakeContext);
-  const data = {
-    labels: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 50]
-      }
-    ]
-  };
   const [quarterYearData, setQuarterYearData] = useState<heatData[]>([]);
+  let data = [];
 
   useEffect(() => {
     const callAndAssign = async () => {
@@ -165,15 +144,6 @@ const BarChartRender = () => {
     backgroundGradientTo: "#fff",
     strokeWidth: 3,
   };
-
-  const commitsData = [
-    { date: "2024-1-1", count: 3 },
-    { date: "2024-01-03", count: 2 },
-    { date: "2024-01-04", count: 3 },
-    { date: "2024-01-05", count: 4 },
-    { date: "2024-01-06", count: 5 },
-    { date: "2024-01-07", count: 1 },
-  ];
 
   return (
     <SafeAreaView>
