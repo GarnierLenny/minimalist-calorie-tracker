@@ -197,7 +197,9 @@ const HomeScreen = ({
       </SafeAreaView>
       <ChangeValueButtons />
       {/* Change selected intake section*/}
-      <ChangeSection />
+      <SafeAreaView style={{marginTop: 50}}>
+        <ChangeSection />
+      </SafeAreaView>
     </SafeAreaView>
   );
 };

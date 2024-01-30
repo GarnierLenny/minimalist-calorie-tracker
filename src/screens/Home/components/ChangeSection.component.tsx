@@ -13,6 +13,7 @@ type ChangeSelectButtonProps = {
 const ChangeSection = () => {
   const { intakeTrack, selected, setSelected } = useContext(IntakeContext);
   const selectedString = intakeTrack[selected].unitName;
+
   const changeSelected = async (newSelected: number) => {
     setSelected(newSelected);
     AsyncStorage.setItem("last-selected", newSelected.toString());
@@ -65,7 +66,6 @@ const ChangeSection = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flexDirection: "row",
-    marginTop: 50,
     justifyContent: "space-evenly",
     width: "70%",
     alignSelf: "center",
