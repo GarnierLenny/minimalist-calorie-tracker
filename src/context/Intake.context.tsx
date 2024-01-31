@@ -1,5 +1,6 @@
 import React, { createContext } from 'react';
 import { unit } from '../screens/Home/Home.types';
+import { heatData } from '../screens/Charts/Charts.types';
 
 // intakeTrack,
 // setIntakeTrack,
@@ -19,6 +20,8 @@ type IntakeContextType = {
   setDate: React.Dispatch<React.SetStateAction<Date>>;
   editGoal: boolean;
   setEditGoal: React.Dispatch<React.SetStateAction<boolean>>;
+  quarterYearData: heatData[][],
+  setQuarterYearData: React.Dispatch<React.SetStateAction<heatData[][]>>;
 };
 
 const defaultValues: IntakeContextType = {
@@ -29,7 +32,9 @@ const defaultValues: IntakeContextType = {
   date: new Date(),
   setDate: () => {},
   editGoal: false,
-  setEditGoal: () => {}
-,};
+  setEditGoal: () => {},
+  quarterYearData: [],
+  setQuarterYearData: () => {},
+};
 
 export const IntakeContext = createContext<IntakeContextType>({...defaultValues});

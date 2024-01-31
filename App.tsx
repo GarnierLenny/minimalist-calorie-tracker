@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState } from "react";
 import { unit } from "./src/screens/Home/Home.types";
 import { IntakeContext } from "./src/context/Intake.context";
+import { heatData } from "./src/screens/Charts/Charts.types";
 
 
 export type RootStackParamList = {
@@ -43,6 +44,7 @@ export default function App() {
   const [selected, setSelected] = useState<number>(0);
   const [date, setDate] = useState<Date>(new Date());
   const [editGoal, setEditGoal] = useState<boolean>(true);
+  const [quarterYearData, setQuarterYearData] = useState<heatData[][]>([]);
 
   return (
     <IntakeContext.Provider value={{
@@ -54,6 +56,8 @@ export default function App() {
       setDate,
       editGoal,
       setEditGoal,
+      quarterYearData,
+      setQuarterYearData,
       }}
     >
       <NavigationContainer>

@@ -6,14 +6,14 @@ import { valuesGoalDatesObject, heatData, heatValue } from "../Charts.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ContributionGraph } from 'react-native-chart-kit';
 
-const getValuesGoalsDates = (name: string): valuesGoalDatesObject => {
+export const getValuesGoalsDates = (name: string, numberOfDays: number): valuesGoalDatesObject => {
   const values: string[] = [];
   const goals: string[] = [];
   const dates: string[] = [];
   const baseDate: Date = new Date();
 
-  baseDate.setDate(baseDate.getDate() - 89);
-  for (let i = 0; i < 90; i++) {
+  baseDate.setDate(baseDate.getDate() - (numberOfDays - 1));
+  for (let i = 0; i < numberOfDays; i++) {
     dates.push(formatDate(baseDate));
 
     values.push(`${name}-${dates[i]}-value`);
@@ -28,47 +28,46 @@ const getValuesGoalsDates = (name: string): valuesGoalDatesObject => {
   };
 };
 
-const retrieve90days = async (name: string): Promise<heatData[]> => {
-  const { values, goals, dates } = getValuesGoalsDates(name);
-
+export const retrieveNDays = async (name: string, numberOfDays: number): Promise<heatData[]> => {
+  const { values, goals, dates } = getValuesGoalsDates(name, numberOfDays);
 
   const queryValues = await AsyncStorage.multiGet(values);
   const queryGoals = await AsyncStorage.multiGet(goals);
   const defaultGoal = await AsyncStorage.getItem(`${name}-defaultgoal`);
-  const caloriesHeat: heatData[] = [];
+  const heat: heatData[] = [];
 
   const scoreToHeat = (score: number): number | undefined => {
     return heatValue.find((heat) => score >= heat.lowerBound && score <= heat.upperBound)?.value;
   };
 
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < numberOfDays; i++) {
     if (queryValues[i][1] !== null) {
       const score: number | undefined = queryGoals[i][1] === null ?
       scoreToHeat(Math.round(Number(queryValues[i][1]) * 100 / Number(defaultGoal)))
       :
       scoreToHeat(Math.round(Number(queryValues[i][1]) * 100 / Number(queryGoals[i][1])));
 
-      caloriesHeat.push({
+      heat.push({
         date: dates[i],
         count: score,
       });
     }
   };
-  return caloriesHeat;
+  return heat;
 };
 
 const Heatmap = () => {
   const {
     intakeTrack,
   } = useContext(IntakeContext);
-  const [quarterYearData, setQuarterYearData] = useState<heatData[][]>([]);
+  const { quarterYearData, setQuarterYearData } = useContext(IntakeContext);
   const { selected } = useContext(IntakeContext);
 
   useEffect(() => {
     const callAndAssign = async () => {
-      const calories = await retrieve90days('calories');
-      const proteins = await retrieve90days('proteins');
-      const water = await retrieve90days('water');
+      const calories = await retrieveNDays('calories', 90);
+      const proteins = await retrieveNDays('proteins', 90);
+      const water = await retrieveNDays('water', 90);
 
       setQuarterYearData((old: heatData[][]) => {
         const newArr: heatData[][] = [...old];
