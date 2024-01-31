@@ -1,3 +1,5 @@
+import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types";
+
 type heatSpan = {
   lowerBound: number;
   upperBound: number;
@@ -51,4 +53,28 @@ export type valuesGoalDatesObject = {
   values: string[];
   goals: string[];
   dates: string[];
+};
+
+export type valueGoalObject = {
+  name: string;
+  values: readonly KeyValuePair[];
+  goals: readonly KeyValuePair[];
+  weekAverage: number;
+}
+
+export type intakes = {
+  calories: valueGoalObject;
+  proteins: valueGoalObject;
+  water: valueGoalObject;
+};
+
+export type ProgressBarProps = {
+  progress: number;
+  color: string;
+};
+
+export type RenderIntakeProgressProps = {
+  name: string;
+  value: number;
+  color: string;
 };
