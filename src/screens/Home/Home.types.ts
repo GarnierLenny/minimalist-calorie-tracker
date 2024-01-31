@@ -1,7 +1,7 @@
 export type getSelectedType = {
   [key: string]: {
-    unit: unit,
-    setter: any,
+    unit: unit;
+    setter: any;
   };
 };
 
@@ -18,6 +18,7 @@ export type customButtonIconProps = {
   iconSize: number;
   paddingInc?: number;
   disabled?: boolean;
+  text?: string;
 };
 
 export type unit = {
@@ -25,11 +26,4 @@ export type unit = {
   goal: number;
   unitName: string;
   unitType: string;
-};
-
-export type ChangeValueButtonsProps = {
-  date: Date;
-  setIntakeTrack: any;
-  selected: unit;
-  editGoal: boolean;
 };
