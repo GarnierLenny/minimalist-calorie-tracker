@@ -5,6 +5,7 @@ import { formatDate } from "../../../utils/formatDate";
 import { valuesGoalDatesObject, heatData, heatValue } from "../Charts.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ContributionGraph } from 'react-native-chart-kit';
+import { IntakeColors } from '../Charts.types';
 
 export const getValuesGoalsDates = (name: string, numberOfDays: number): valuesGoalDatesObject => {
   const values: string[] = [];
@@ -85,7 +86,11 @@ const Heatmap = () => {
 
   const screenWidth = Dimensions.get('screen').width;
   const chartConfig = {
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    color: (opacity = 1) => {
+      const color = IntakeColors[selected].color;
+
+      return `rgba(${color === undefined ? '0,0,0' : color}, ${opacity})`;
+    },
     backgroundGradientFromOpacity: 0,
     backgroundGradientToOpacity: 0,
     strokeWidth: 3,

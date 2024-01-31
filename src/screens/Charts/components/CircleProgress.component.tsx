@@ -4,8 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { IntakeContext } from "../../../context/Intake.context";
 import { getValuesGoalsDates } from "./Heatmap.component";
-import { ProgressBarProps, valueGoalObject, intakes, RenderIntakeProgressProps } from "../Charts.types";
+import { ProgressBarProps, valueGoalObject, intakes, RenderIntakeProgressProps, intakeColor } from "../Charts.types";
 import { ProgressChart } from 'react-native-chart-kit';
+import { IntakeColors } from '../Charts.types';
 
 const ProgressBar = ({progress, color}: ProgressBarProps) => {
   return (
@@ -112,17 +113,17 @@ const Circles = () => {
     {
       name: 'Calories',
       value: intakes.calories.weekAverage / 100,
-      color: '237, 174, 73',
+      color: IntakeColors.find((item: intakeColor) => item.unitName === 'calories')?.color,
     },
     {
       name: 'Proteins',
       value: intakes.proteins.weekAverage / 100,
-      color: '209,73,91',
+      color: IntakeColors.find((item: intakeColor) => item.unitName === 'proteins')?.color,
     },
     {
       name: 'Water',
       value: intakes.water.weekAverage / 100,
-      color: '0,121,140',
+      color: IntakeColors.find((item: intakeColor) => item.unitName === 'water')?.color,
     },
   ];
   const data = {
