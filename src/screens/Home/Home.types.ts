@@ -8,8 +8,10 @@ export type getSelectedType = {
 export type customButtonTextrops = {
   pressCallback: any;
   textContent: string;
+  fontSize?: number;
   paddingInc?: number;
   disabled?: boolean;
+  backLayerOffset?: number;
 };
 
 export type customButtonIconProps = {

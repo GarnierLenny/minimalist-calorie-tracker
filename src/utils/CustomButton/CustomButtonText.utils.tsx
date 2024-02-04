@@ -6,7 +6,9 @@ const CustomButtonText = ({
   pressCallback,
   textContent,
   paddingInc = 0,
+  fontSize = 20,
   disabled = false,
+  backLayerOffset = 0,
 }: customButtonTextrops) => {
   const [pressed, setPressed] = useState<boolean>(false);
 
@@ -16,10 +18,10 @@ const CustomButtonText = ({
         style={{...styles.backLayerContainer,
           paddingVertical: 16 + paddingInc,
           paddingHorizontal: 11 + paddingInc,
-          top: paddingInc !== 0 ? 5 : 10
+          top: paddingInc !== 0 ? 5 : 10 + backLayerOffset,
         }}
       >
-        <Text style={styles.backLayerText} >
+        <Text style={{...styles.backLayerText, fontSize: fontSize}} >
           {textContent}
         </Text>
       </SafeAreaView>
@@ -34,7 +36,7 @@ const CustomButtonText = ({
         onPressOut={() => setPressed(false)}
         onPress={pressCallback}
       >
-        <Text style={styles.frontLayerText}>{textContent}</Text>
+        <Text style={{...styles.frontLayerText, fontSize: fontSize}}>{textContent}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { SafeAreaView, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import {genderEnum, FormFields, FormControlProps, CheckDotProps} from './Form.types';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const {width} = Dimensions.get('screen');
 
 const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormControlProps) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   return (
     <Controller
-      rules={{required: true}}
+      rules={{required: false}}
       control={control}
       name={formField}
       render={({ field: {onChange, onBlur, value}}) => (
@@ -70,19 +73,54 @@ const Form = () => {
     </SafeAreaView>);
   };
 
+  const onSubmit = (data) => {
+    console.log('toto', data);
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <GenderForm />
       <FormControl unit='' inputTitle="Age" control={control} formField='age' placeHolder='0' />
       <FormControl unit='cm' inputTitle="Height" control={control} formField='height' placeHolder='0' />
       <FormControl unit='kg' inputTitle="Weight" control={control} formField='weight' placeHolder='0' />
+      <SafeAreaView style={styles.submitButtonContainer}>
+        <TouchableOpacity
+          onPress={handleSubmit(onSubmit)}
+          style={{...styles.submitButton, backgroundColor: '#000', top: 5, position: 'absolute', zIndex: -1}}
+        >
+          <Text style={{...styles.submitButtonText, color: '#fff'}}>{'Submit  >>'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSubmit(onSubmit)}
+          style={styles.submitButton}
+        >
+          <Text style={styles.submitButtonText}>{'Submit  >>'}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
     </SafeAreaView>
   );
 };
 
-const {width, height} = Dimensions.get('screen');
-
 const styles = StyleSheet.create({
+  submitButtonContainer: {
+    flexDirection: 'row',
+    width: '80%',
+    marginTop: '2%',
+    alignSelf: 'center',
+    justifyContent: 'flex-end',
+  },
+  submitButton: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    right: 0,
+  },
+  submitButtonText: {
+    fontWeight: '500',
+    fontSize: 15,
+  },
   genderText: {
     marginLeft: '3%',
     fontSize: 15,
