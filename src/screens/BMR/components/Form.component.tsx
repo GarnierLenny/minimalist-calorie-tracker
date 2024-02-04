@@ -1,26 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
-import { useForm, Controller, Control } from 'react-hook-form';
-import CheckBox from 'expo-checkbox';
-
-enum genderEnum {
-  male,
-  female,
-};
-
-type FormFields = {
-  age: string;
-  height: string;
-  weight: string;
-};
-
-type FormControlProps = {
-  control: Control<FormFields, any>;
-  formField: string;
-  placeHolder: string;
-  inputTitle: string;
-  unit: string;
-};
+import { useForm, Controller } from 'react-hook-form';
+import {genderEnum, FormFields, FormControlProps, CheckDotProps} from './Form.types';
 
 const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormControlProps) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -55,7 +36,6 @@ const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormCo
 };
 
 const Form = () => {
-  const {width, height} = Dimensions.get('screen');
   const [gender, setGender] = useState<genderEnum>(genderEnum.male);
   const formDefault: FormFields = {
     age: '',
@@ -68,23 +48,31 @@ const Form = () => {
     formState: {errors},
   } = useForm<FormFields>({defaultValues: formDefault});
 
+  const GenderForm = () => {
+    const CheckDot = ({newGender}: CheckDotProps) => {
+      return (
+        <>
+          <TouchableOpacity
+            onPress={() => setGender(newGender)}
+            style={{...styles.checkDot, borderWidth: gender === newGender ? 4.5 : 1.5}}
+          />
+          <Text style={styles.genderText}>{newGender}</Text>
+        </>
+      );
+    };
+
+    return (<SafeAreaView style={styles.inputContainer}>
+      <Text style={styles.inputTitle}>Gender</Text>
+      <SafeAreaView style={styles.checkDotsContainer}>
+        <CheckDot newGender={genderEnum.male} />
+        <CheckDot newGender={genderEnum.female} />
+      </SafeAreaView>
+    </SafeAreaView>);
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <SafeAreaView style={styles.inputContainer}>
-        <Text style={styles.inputTitle}>Gender</Text>
-        <SafeAreaView style={styles.checkDotsContainer}>
-          <TouchableOpacity
-            onPress={() => setGender(genderEnum.male)}
-            style={{...styles.checkDot, borderWidth: gender === genderEnum.male ? 4.5 : 1.5}}
-          />
-          <Text style={styles.genderText}>male</Text>
-          <TouchableOpacity
-            onPress={() => setGender(genderEnum.female)}
-            style={{...styles.checkDot, borderWidth: gender === genderEnum.female ? 4.5 : 1.5}}
-          />
-          <Text style={styles.genderText}>female</Text>
-        </SafeAreaView>
-      </SafeAreaView>
+      <GenderForm />
       <FormControl unit='' inputTitle="Age" control={control} formField='age' placeHolder='0' />
       <FormControl unit='cm' inputTitle="Height" control={control} formField='height' placeHolder='0' />
       <FormControl unit='kg' inputTitle="Weight" control={control} formField='weight' placeHolder='0' />
@@ -107,7 +95,7 @@ const styles = StyleSheet.create({
   },
   checkDot: {
     borderWidth: 1.5,
-    borderColor: 'rgb(0, 122, 255)',
+    borderColor: 'rgb(0, 0, 0)',
     alignSelf: 'center',
     width: width * 0.038,
     height: width * 0.038,
@@ -118,7 +106,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     marginTop: '5%',
     gap: 15,
-    paddingVertical: 15,
+    paddingVertical: '20%',
   },
   inputTitle: {
     fontSize: 20,
