@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import {genderEnum, FormFields, FormControlProps, CheckDotProps} from './Form.types';
+import {genderEnum, FormFields, FormControlProps, CheckDotProps} from '../BMR.types';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../../App';
 
 const {width} = Dimensions.get('screen');
 
@@ -15,22 +17,25 @@ const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormCo
       control={control}
       name={formField}
       render={({ field: {onChange, onBlur, value}}) => (
-        <SafeAreaView style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>{inputTitle}</Text>
-          <SafeAreaView style={styles.inputUnitContainer}>
-            <TextInput
-              keyboardType='number-pad'
-              placeholder={placeHolder}
-              value={value}
-              onChangeText={onChange}
-              onBlur={() => {onBlur(); setIsFocused(false)}}
-              onFocus={() => setIsFocused(true)}
-              style={{
-                ...styles.input,
-                borderColor: isFocused === true ? 'rgb(0, 122, 255)' : '#000',
-              }}
-            />
-            <Text style={styles.unit}>{unit}</Text>
+        <SafeAreaView>
+          <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: '45%', zIndex: -1}} />
+          <SafeAreaView style={styles.inputContainer}>
+            <Text style={styles.inputTitle}>{inputTitle}</Text>
+            <SafeAreaView style={styles.inputUnitContainer}>
+              <TextInput
+                keyboardType='number-pad'
+                placeholder={placeHolder}
+                value={value}
+                onChangeText={onChange}
+                onBlur={() => {onBlur(); setIsFocused(false)}}
+                onFocus={() => setIsFocused(true)}
+                style={{
+                  ...styles.input,
+                  borderColor: isFocused === true ? 'rgb(0, 122, 255)' : '#000',
+                }}
+              />
+              <Text style={styles.unit}>{unit}</Text>
+            </SafeAreaView>
           </SafeAreaView>
         </SafeAreaView>
       )}
@@ -38,7 +43,7 @@ const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormCo
   );
 };
 
-const Form = () => {
+const Form = ({navigation}: any) => {
   const [gender, setGender] = useState<genderEnum>(genderEnum.male);
   const formDefault: FormFields = {
     age: '',
@@ -64,17 +69,37 @@ const Form = () => {
       );
     };
 
-    return (<SafeAreaView style={styles.inputContainer}>
-      <Text style={styles.inputTitle}>Gender</Text>
-      <SafeAreaView style={styles.checkDotsContainer}>
-        <CheckDot newGender={genderEnum.male} />
-        <CheckDot newGender={genderEnum.female} />
+    return (
+      <SafeAreaView>
+        <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: '45%', zIndex: -1}} />
+        <SafeAreaView style={styles.inputContainer}>
+          <Text style={styles.inputTitle}>Gender</Text>
+          <SafeAreaView style={styles.checkDotsContainer}>
+            <CheckDot newGender={genderEnum.male} />
+            <CheckDot newGender={genderEnum.female} />
+          </SafeAreaView>
+        </SafeAreaView>
       </SafeAreaView>
-    </SafeAreaView>);
+    );
   };
 
-  const onSubmit = (data) => {
-    console.log('toto', data);
+  const onSubmit = (data: FormFields) => {
+    if (
+      data.age === '' ||
+      data.height === '' ||
+      data.weight === '' ||
+      gender === undefined
+    ) {
+      console.log('Fields empty');
+      return;
+    }
+    const genderCoef: number[] = gender === genderEnum.male ?
+      [88.362, 13.397,  4.799, 5.677] : //male
+      [447.593, 9.247, 3.098, 4.330]; //female
+    const bmr = (Math.round(genderCoef[0] + (74 * genderCoef[1]) + (180 * genderCoef[2]) - (22 * genderCoef[3])));
+    console.log("🚀 ~ onSubmit ~ bmr:", bmr)
+
+    navigation.push('Result', {bmr: bmr});
   };
 
   return (
@@ -86,7 +111,7 @@ const Form = () => {
       <SafeAreaView style={styles.submitButtonContainer}>
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
-          style={{...styles.submitButton, backgroundColor: '#000', top: 5, position: 'absolute', zIndex: -1}}
+          style={{...styles.submitButton, backgroundColor: '#000', top: 3, position: 'absolute', zIndex: -1}}
         >
           <Text style={{...styles.submitButtonText, color: '#fff'}}>{'Submit  >>'}</Text>
         </TouchableOpacity>
@@ -105,13 +130,13 @@ const styles = StyleSheet.create({
   submitButtonContainer: {
     flexDirection: 'row',
     width: '80%',
-    marginTop: '2%',
+    marginTop: '4%',
     alignSelf: 'center',
     justifyContent: 'flex-end',
   },
   submitButton: {
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 15,
     paddingHorizontal: 20,
     paddingVertical: 12,
     backgroundColor: '#fff',
@@ -142,7 +167,6 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     display: 'flex',
-    marginTop: '5%',
     gap: 15,
     paddingVertical: '20%',
   },
@@ -155,12 +179,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: '5%',
     width: '80%',
+    borderRadius: 10,
     alignSelf: 'center',
     paddingVertical: 20,
-    elevation: 5,
-    shadowRadius: 3.84,
-    shadowOffset: { width: 0, height: 0 },
-    borderBottomWidth: 1,
+    borderWidth: 1,
     backgroundColor: 'rgba(255, 255, 255, 1)',
   },
   inputUnitContainer: {
@@ -178,15 +200,12 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 19,
     fontWeight: '400',
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingVertical: 5,
     paddingLeft: 10,
     alignSelf: 'flex-end',
-    paddingRight: 5,
-    width: '60%',
-    backgroundColor: 'rgba(0, 0, 0, 0.03)',
-    borderBottomWidth: 0.2,
-    // right: 50,
+    width: '70%',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderBottomWidth: 2,
   },
 });
 
