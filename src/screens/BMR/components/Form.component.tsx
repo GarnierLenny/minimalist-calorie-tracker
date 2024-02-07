@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { SafeAreaView, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import {genderEnum, FormFields, FormControlProps, CheckDotProps} from '../BMR.types';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../../App';
+import {Picker} from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const {width} = Dimensions.get('screen');
 
@@ -18,7 +17,7 @@ const FormControl = ({control, formField, placeHolder, inputTitle, unit}: FormCo
       name={formField}
       render={({ field: {onChange, onBlur, value}}) => (
         <SafeAreaView>
-          <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: '45%', zIndex: -1}} />
+          <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: 31, zIndex: -1}} />
           <SafeAreaView style={styles.inputContainer}>
             <Text style={styles.inputTitle}>{inputTitle}</Text>
             <SafeAreaView style={styles.inputUnitContainer}>
@@ -71,7 +70,7 @@ const Form = ({navigation}: any) => {
 
     return (
       <SafeAreaView>
-        <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: '45%', zIndex: -1}} />
+        <SafeAreaView style={{...styles.inputContainer, backgroundColor: '#000', position: 'absolute', top: 31, zIndex: -1}} />
         <SafeAreaView style={styles.inputContainer}>
           <Text style={styles.inputTitle}>Gender</Text>
           <SafeAreaView style={styles.checkDotsContainer}>
@@ -83,12 +82,24 @@ const Form = ({navigation}: any) => {
     );
   };
 
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    {label: 'Basal metabolic rate', value: '1.0'},
+    {label: 'Little to no exercise', value: '1.30'},
+    {label: 'Light exercises 1-3 days/week', value: '1.40'},
+    {label: 'Moderade exercises 3-5 days/week', value: '1.53'},
+    {label: 'Hard exercises 6-7 days/week', value: '1.71'},
+    {label: 'Daily intense exercises or physical job', value: '2.1'},
+  ]);
+
   const onSubmit = (data: FormFields) => {
     if (
       data.age === '' ||
       data.height === '' ||
       data.weight === '' ||
-      gender === undefined
+      gender === undefined ||
+      value === null
     ) {
       console.log('Fields empty');
       return;
@@ -97,17 +108,43 @@ const Form = ({navigation}: any) => {
       [88.362, 13.397,  4.799, 5.677] : //male
       [447.593, 9.247, 3.098, 4.330]; //female
     const bmr = (Math.round(genderCoef[0] + (74 * genderCoef[1]) + (180 * genderCoef[2]) - (22 * genderCoef[3])));
-    console.log("🚀 ~ onSubmit ~ bmr:", bmr)
-
-    navigation.push('Result', {bmr: bmr});
+    navigation.push('Result', {bmr: bmr, weight: Number(data.weight), activity: Number(value)});
   };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
       <GenderForm />
+
       <FormControl unit='' inputTitle="Age" control={control} formField='age' placeHolder='0' />
       <FormControl unit='cm' inputTitle="Height" control={control} formField='height' placeHolder='0' />
       <FormControl unit='kg' inputTitle="Weight" control={control} formField='weight' placeHolder='0' />
+
+      <SafeAreaView style={styles.activityPickerContainer}>
+        <DropDownPicker
+          disabled
+          style={{paddingVertical: '6.5%', alignSelf: 'center', position: 'absolute', backgroundColor: '#000', top: 5, zIndex: -1}}
+          // itemStyle={{fontWeight: '400', fontSize: 10}}
+          open={false}
+          value={value}
+          items={items}
+          setOpen={() => {}}
+          setValue={setValue}
+        />
+        <DropDownPicker
+          placeholder="Select weekly physical activity"
+          style={{paddingVertical: '6.5%', alignSelf: 'center'}}
+          textStyle={{fontWeight: '500', fontSize: 15, marginLeft: '4%'}}
+          placeholderStyle={{fontWeight: '500', fontSize: 15, marginLeft: '4%'}}
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+        />
+      </SafeAreaView>
+
+      {/* Submit button */}
       <SafeAreaView style={styles.submitButtonContainer}>
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
@@ -127,6 +164,11 @@ const Form = ({navigation}: any) => {
 };
 
 const styles = StyleSheet.create({
+  activityPickerContainer: {
+    width: '80%',
+    alignSelf: 'center',
+    borderRadius: 15,
+  },
   submitButtonContainer: {
     flexDirection: 'row',
     width: '80%',
@@ -166,9 +208,9 @@ const styles = StyleSheet.create({
     marginLeft: '12%',
   },
   mainContainer: {
+    // backgroundColor: '#ff3',
     display: 'flex',
     gap: 15,
-    paddingVertical: '20%',
   },
   inputTitle: {
     fontSize: 20,

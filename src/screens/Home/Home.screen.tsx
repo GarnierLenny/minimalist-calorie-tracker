@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
+  Text,
 } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RootStackParamList } from "../../../App";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { IntakeContext } from "../../context/Intake.context";
 import Animated, {
@@ -21,6 +21,8 @@ import ChangeValueButtons from "./components/ChangeValueButtons.component";
 import DateSection from "./components/ChangeDate.component";
 import CustomButtonIcon from "../../utils/CustomButton/CustomButtonIcon.utils";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import { RootStackParamList } from "../../navigation/Tab/Tab.types";
+import Toast from 'react-native-toast-message';
 
 const HomeScreen = ({
   navigation,
@@ -157,61 +159,74 @@ const HomeScreen = ({
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
+    <SafeAreaView style={styles.alignContainer}>
       {/* date section*/}
       <DateSection />
-      {/* 0g / 2100g section*/}
-      <AnimatedCircularProgress
-        size={width * 0.7}
-        width={17}
-        fill={fill}
-        style={{alignSelf: 'center', marginBottom: 40}}
-        tintColor="#00e0ff"
-        // onAnimationComplete={() => console.log('onAnimationComplete')}
-        backgroundColor="#3d5875"
-      >
-        {
-        (fill) => (
-        <SafeAreaView style={styles.valueGoalContainer}>
-          <Animated.Text style={textValueStyle}>
-            {intakeTrack[selected].value}
-          </Animated.Text>
-          <Animated.Text style={textGoalStyle}>
-            /{intakeTrack[selected].goal}
-            {intakeTrack[selected].unitType}
-          </Animated.Text>
+      <SafeAreaView style={styles.mainContainer}>
+        {/* 0g / 2100g section*/}
+        <AnimatedCircularProgress
+          size={width * 0.7}
+          width={17}
+          fill={fill}
+          style={{alignSelf: 'center', marginBottom: 40}}
+          tintColor="#00e0ff"
+          // onAnimationComplete={() => console.log('onAnimationComplete')}
+          backgroundColor="#3d5875"
+        >
+          {
+          (fill) => (
+          <SafeAreaView style={styles.valueGoalContainer}>
+            <Animated.Text style={textValueStyle}>
+              {intakeTrack[selected].value}
+            </Animated.Text>
+            <Animated.Text style={textGoalStyle}>
+              /{intakeTrack[selected].goal}
+              {intakeTrack[selected].unitType}
+            </Animated.Text>
+          </SafeAreaView>
+          )
+        }
+        </AnimatedCircularProgress>
+        <SafeAreaView style={styles.valueGoalButton}>
+          <CustomButtonIcon
+            pressCallback={() => {
+              setEditGoal(!editGoal);
+              return editGoal ? focusGoal() : focusValue();
+            }}
+            text={'Edit ' + (!editGoal ? 'intake' : 'goal')}
+            iconName={!editGoal ? "pencil" : "target"}
+            iconSize={20}
+          />
         </SafeAreaView>
-        )
-      }
-      </AnimatedCircularProgress>
-      <SafeAreaView style={styles.valueGoalButton}>
-        <CustomButtonIcon
-          pressCallback={() => {
-            setEditGoal(!editGoal);
-            return editGoal ? focusGoal() : focusValue();
-          }}
-          text={'Edit ' + (!editGoal ? 'intake' : 'goal')}
-          iconName={!editGoal ? "pencil" : "target"}
-          iconSize={20}
-        />
+        <ChangeValueButtons />
+        {/* Change selected intake section*/}
+        <SafeAreaView style={{marginTop: 50}}>
+          <ChangeSection />
+        </SafeAreaView>
       </SafeAreaView>
-      <ChangeValueButtons />
-      {/* Change selected intake section*/}
-      <SafeAreaView style={{marginTop: 50}}>
-        <ChangeSection />
-      </SafeAreaView>
+      <Toast />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  mainTitle: {
+    marginLeft: '3%',
+    fontWeight: '800',
+    fontSize: 25,
+  },
+  alignContainer: {
+    height: '100%',
+    justifyContent: 'center',
+  },
   selectionText: {
     fontSize: 15,
   },
   mainContainer: {
     display: "flex",
+    marginTop: '30%',
+    // backgroundColor: '#ff2',
     justifyContent: "center",
-    flex: 1,
   },
   valueGoalContainer: {
     flexDirection: "row",

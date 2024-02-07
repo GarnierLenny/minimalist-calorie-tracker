@@ -1,4 +1,4 @@
 export type BMRStackParamList = {
   BMR: undefined;
-  Result: { bmr: number };
+  Result: { bmr: number, activity: number, weight: number };
 };

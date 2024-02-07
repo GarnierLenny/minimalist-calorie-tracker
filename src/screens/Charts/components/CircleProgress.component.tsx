@@ -161,7 +161,7 @@ const Circles = () => {
           <Text style={styles.circleHeaderText}>Intakes</Text>
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={styles.circleHeaderText}>See more </Text>
-            <Icon name="arrow-right" />
+            <Icon name="arrow-right" size={12} />
           </TouchableOpacity>
         </SafeAreaView>
         <SafeAreaView style={{marginTop: 10}}>
@@ -187,7 +187,6 @@ const styles = StyleSheet.create({
   circleRightHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     paddingLeft: 5,
     paddingRight: 10,
   },
@@ -200,6 +199,7 @@ const styles = StyleSheet.create({
   },
   lineSeparator: {
     height: '80%',
+    marginRight: '2%',
     width: 2,
     marginHorizontal: 10,
     alignSelf: 'center',
