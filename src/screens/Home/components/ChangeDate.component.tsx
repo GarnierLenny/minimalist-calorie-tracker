@@ -91,8 +91,7 @@ const DateSection = () => {
 const styles = StyleSheet.create({
   dateContainer: {
     // backgroundColor: '#a20',
-    position: "absolute",
-    top: 20,
+    top: '5%',
     alignItems: "center",
     flexDirection: "row",
     width: "57%",

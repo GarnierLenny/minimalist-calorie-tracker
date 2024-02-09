@@ -78,3 +78,23 @@ export type RenderIntakeProgressProps = {
   value: number;
   color: string;
 };
+
+export type intakeColor = {
+  unitName: string;
+  color: string;
+};
+
+export const IntakeColors: intakeColor[] = [
+  {
+    unitName: 'calories',
+    color: '237, 174, 73',
+  },
+  {
+    unitName: 'proteins',
+    color: '209,73,91',
+  },
+  {
+    unitName: 'water',
+    color: '0,121,140',
+  },
+];

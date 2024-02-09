@@ -5,6 +5,7 @@ import SafeAreaView from 'react-native-safe-area-view';
 import Animated, { FlipInEasyX, FlipOutEasyX } from "react-native-reanimated";
 import { unit } from "../Home.types";
 import { IntakeContext } from "../../../context/Intake.context";
+import Toast from 'react-native-toast-message';
 
 type ChangeSelectButtonProps = {
   targetSelection: string;
@@ -13,6 +14,13 @@ type ChangeSelectButtonProps = {
 const ChangeSection = () => {
   const { intakeTrack, selected, setSelected } = useContext(IntakeContext);
   const selectedString = intakeTrack[selected].unitName;
+
+  const showToast = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'This feature will be coming soon! 👋',
+    });
+  }
 
   const changeSelected = async (newSelected: number) => {
     setSelected(newSelected);
@@ -58,7 +66,9 @@ const ChangeSection = () => {
           <ChangeSelectButton key={index} targetSelection={item.unitName} />
         );
       })}
-      <Text style={styles.addSelectionButton}>+</Text>
+      <TouchableOpacity onPress={showToast}>
+        <Text style={styles.addSelectionButton}>+</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
