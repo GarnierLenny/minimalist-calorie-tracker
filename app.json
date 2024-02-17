@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "minimalist-calorie-tracker",
+    "name": "Minimalist Calorie Tracker",
     "slug": "minimalist-calorie-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,18 +11,27 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lenny00.minimalistcalorietracker"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.lenny00.minimalistcalorietracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c8dd2b68-a7c8-4277-89de-97330148e2f7"
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import IconButton from "../../../utils/IconButton/IconButton.component";
 import Animated, {
@@ -32,58 +32,64 @@ const DateSection = () => {
   };
 
   return (
-    <SafeAreaView style={styles.dateContainer}>
-      <IconButton
-        name="less-than"
-        size={26}
-        callback={() => changeDateHandler(-1)}
+    <SafeAreaView style={{width: '100%'}}>
+      <Image
+        source={require('../../../assets/mct_nobg.png')}
+        style={{ width: 70, height: 70, alignSelf: 'center'}}
       />
-      <Modal
-        isVisible={modalVisible}
-        avoidKeyboard={true}
-        animationIn="slideInDown"
-        animationOut="slideOutUp"
-        style={styles.popup}
-      >
-        <Calendar
-          enableSwipeMonths={true}
-          style={styles.calendar}
-          maxDate={maxDate.toString()}
-          onDayPress={(day) => {
-            const newDate = new Date(day.dateString);
-            setDate(newDate);
-            setModalVisible(false);
-          }}
+      <SafeAreaView style={styles.dateContainer}>
+        <IconButton
+          name="less-than"
+          size={26}
+          callback={() => changeDateHandler(-1)}
         />
-        <SafeAreaView>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => setModalVisible(false)}
-            style={styles.closeButton}
-          >
-            <Text
-              style={styles.closeButtonText}
+        <Modal
+          isVisible={modalVisible}
+          avoidKeyboard={true}
+          animationIn="slideInDown"
+          animationOut="slideOutUp"
+          style={styles.popup}
+        >
+          <Calendar
+            enableSwipeMonths={true}
+            style={styles.calendar}
+            maxDate={maxDate.toString()}
+            onDayPress={(day) => {
+              const newDate = new Date(day.dateString);
+              setDate(newDate);
+              setModalVisible(false);
+            }}
+          />
+          <SafeAreaView>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}
             >
-              CLOSE
-            </Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </Modal>
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.dateTextContainer}
-      >
-        <Text style={styles.dateText}>
-          {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}
-        </Text>
-      </TouchableOpacity>
-      <IconButton
-        color="#000"
-        disabled={formatDate(date) === referenceDate ? true : false}
-        name="greater-than"
-        size={26}
-        callback={() => changeDateHandler(+1)}
-      />
+              <Text
+                style={styles.closeButtonText}
+              >
+                CLOSE
+              </Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+        </Modal>
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.dateTextContainer}
+        >
+          <Text style={styles.dateText}>
+            {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}
+          </Text>
+        </TouchableOpacity>
+        <IconButton
+          color="#000"
+          disabled={formatDate(date) === referenceDate ? true : false}
+          name="greater-than"
+          size={26}
+          callback={() => changeDateHandler(+1)}
+        />
+      </SafeAreaView>
     </SafeAreaView>
   );
 };

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   mapContainer: {
     // backgroundColor: '#ff2',
     gap: 10,
-    paddingVertical: '8%',
+    marginTop: '2%',
   },
   proteinsText1: {
     fontSize: 17,
