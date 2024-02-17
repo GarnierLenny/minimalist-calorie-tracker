@@ -9,6 +9,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ChartsScreen from "../../screens/Charts/Charts.screen";
 import HomeScreen from "../../screens/Home/Home.screen";
 import BMRParent from "../BMRParent/BMRParent.navigation";
+import { StatusBar } from "expo-status-bar";
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
@@ -53,6 +54,7 @@ export default function TabParent() {
       }}
     >
       <NavigationContainer>
+        <StatusBar style='auto' />
         <Tab.Navigator screenOptions={{headerShown: false}}>
           <Tab.Screen
             name="Home"
@@ -69,7 +71,7 @@ export default function TabParent() {
             initialParams={{intakeTrack}}
             component={ChartsScreen}
             options={{
-              tabBarLabel: 'Intake',
+              tabBarLabel: 'Charts',
               tabBarIcon: ({ color, size }) => (
                 <Icon name="chart-bar" color={color} size={size} />
               ),
@@ -79,7 +81,7 @@ export default function TabParent() {
           name="BMRParent"
           component={BMRParent}
           options={{
-            tabBarLabel: 'Intake',
+            tabBarLabel: 'BMR',
             tabBarIcon: ({ color, size }) => (
               <Icon name="speedometer" color={color} size={size} />
             ),

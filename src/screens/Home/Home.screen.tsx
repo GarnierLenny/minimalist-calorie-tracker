@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
-  Text,
+  Image,
 } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -169,9 +169,9 @@ const HomeScreen = ({
           width={17}
           fill={fill}
           style={{alignSelf: 'center', marginBottom: 40}}
-          tintColor="#00e0ff"
+          tintColor="#00798C"
           // onAnimationComplete={() => console.log('onAnimationComplete')}
-          backgroundColor="#3d5875"
+          backgroundColor="#b7c2ce"
         >
           {
           (fill) => (
@@ -216,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   alignContainer: {
+    // backgroundColor: '#ff2',
     height: '100%',
     justifyContent: 'center',
   },
@@ -224,8 +225,8 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     display: "flex",
-    marginTop: '30%',
-    // backgroundColor: '#ff2',
+    marginTop: '15%',
+    // backgroundColor: '#0f2',
     justifyContent: "center",
   },
   valueGoalContainer: {
